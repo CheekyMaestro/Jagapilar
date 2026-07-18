@@ -208,10 +208,18 @@
         <div class="absolute -top-20 -right-20 w-80 h-80 bg-sky-blue/10 rounded-full blur-3xl pointer-events-none decorative-shape"></div>
         <div class="absolute -bottom-20 -left-20 w-96 h-96 bg-pink-bright/5 rounded-full blur-3xl pointer-events-none decorative-shape"></div>
 
+        <!-- Entry Section (Input Neuro ID) -->
+        <div id="entry-section" class="relative z-10 flex flex-col items-center justify-center max-w-lg w-full bg-surface-container-lowest p-8 rounded-[24px] shadow-lg border border-outline-variant/30">
+            <h2 class="text-headline-md font-headline-md text-primary mb-4 text-center">Mulai Asesmen</h2>
+            <p class="text-body-md text-on-surface-variant mb-6 text-center">Masukkan Neuro ID yang diberikan oleh orang tuamu.</p>
+            <input type="text" id="neuro-id-input" class="w-full font-mono text-center tracking-widest text-lg border-outline-variant rounded-lg p-4 mb-6 focus:ring-primary focus:border-primary" placeholder="NP-XXXX-XXXX" required>
+            <button onclick="startAssessment()" class="w-full bg-primary text-white font-label-caps py-4 rounded-lg hover:bg-teal-deep transition">MULAI SEKARANG</button>
+        </div>
+
         <!-- Loading State -->
-        <div id="loading-section" class="relative z-10 flex flex-col items-center justify-center">
+        <div id="loading-section" class="relative z-10 hidden flex-col items-center justify-center">
             <div class="spinner w-12 h-12 mb-4"></div>
-            <p class="text-primary font-headline-md">Menyiapkan Misi...</p>
+            <p class="text-primary font-headline-md text-center">Menyiapkan Misi...</p>
         </div>
 
         <!-- Assessment Card Container (Question State) -->

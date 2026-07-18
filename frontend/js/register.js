@@ -1,133 +1,91 @@
 // ============================================================
-// JAGAPILAR — Registration Page Logic
-// Step wizard, file upload, form validation, API submission
+// JAGAPILAR — Registration/Login Logic
+// Parent & Teacher Roles
 // ============================================================
 
-/**
- * Navigate between steps in the registration wizard
- */
-function goToStep(step) {
-    const step1 = document.getElementById('step-1');
-    const step2 = document.getElementById('step-2');
-    const dot2 = document.getElementById('dot-2');
-    const lineFill = document.getElementById('line-fill');
+document.addEventListener('DOMContentLoaded', () => {
+    // Check URL params for role selection
+    const urlParams = new URLSearchParams(window.location.search);
+    const role = urlParams.get('role');
+    if (role === 'teacher') {
+        switchRole('teacher');
+    }
+});
 
-    if (step === 1) {
-        step2.classList.remove('active-step');
-        step2.classList.add('hidden-step');
-        setTimeout(() => {
-            step1.classList.remove('hidden-step');
-            step1.classList.add('active-step');
-        }, 300);
+function switchRole(role) {
+    const tabParent = document.getElementById('tab-parent');
+    const tabTeacher = document.getElementById('tab-teacher');
+    const schoolFieldContainer = document.getElementById('school-field-container');
+    const userRoleInput = document.getElementById('user-role');
 
-        dot2.classList.replace('bg-primary', 'bg-surface-container-high');
-        dot2.classList.replace('text-white', 'text-on-surface-variant');
-        lineFill.style.width = '0%';
-    } else if (step === 2) {
-        // Validate step 1 fields before proceeding
-        const name = document.getElementById('school-name').value.trim();
-        const city = document.getElementById('school-city').value.trim();
-        const grade = document.getElementById('school-grade').value;
-        const principal = document.getElementById('school-principal').value.trim();
-        const classes = document.getElementById('school-classes').value;
+    if (role === 'parent') {
+        // Style active tab
+        tabParent.classList.replace('text-on-surface-variant', 'text-primary');
+        tabParent.classList.replace('border-transparent', 'border-primary');
+        tabParent.classList.add('bg-primary/5');
+        tabParent.classList.remove('hover:bg-surface-container-low');
 
-        if (!name || !city || !grade || !principal || !classes) {
-            showToast('Mohon lengkapi semua field terlebih dahulu', 'warning');
-            return;
-        }
+        // Style inactive tab
+        tabTeacher.classList.replace('text-primary', 'text-on-surface-variant');
+        tabTeacher.classList.replace('border-primary', 'border-transparent');
+        tabTeacher.classList.remove('bg-primary/5');
+        tabTeacher.classList.add('hover:bg-surface-container-low');
 
-        step1.classList.remove('active-step');
-        step1.classList.add('hidden-step');
-        setTimeout(() => {
-            step2.classList.remove('hidden-step');
-            step2.classList.add('active-step');
-        }, 300);
+        schoolFieldContainer.classList.add('hidden');
+        userRoleInput.value = 'parent';
+    } else if (role === 'teacher') {
+        // Style active tab
+        tabTeacher.classList.replace('text-on-surface-variant', 'text-primary');
+        tabTeacher.classList.replace('border-transparent', 'border-primary');
+        tabTeacher.classList.add('bg-primary/5');
+        tabTeacher.classList.remove('hover:bg-surface-container-low');
 
-        dot2.classList.replace('bg-surface-container-high', 'bg-primary');
-        dot2.classList.replace('text-on-surface-variant', 'text-white');
-        lineFill.style.width = '100%';
+        // Style inactive tab
+        tabParent.classList.replace('text-primary', 'text-on-surface-variant');
+        tabParent.classList.replace('border-primary', 'border-transparent');
+        tabParent.classList.remove('bg-primary/5');
+        tabParent.classList.add('hover:bg-surface-container-low');
+
+        schoolFieldContainer.classList.remove('hidden');
+        userRoleInput.value = 'teacher';
     }
 }
 
-/**
- * Handle file upload preview
- */
-function handleFile(event) {
-    const file = event.target.files[0];
-    if (!file) return;
+async function submitForm(event) {
+    event.preventDefault();
+    
+    const role = document.getElementById('user-role').value;
+    const name = document.getElementById('reg-name').value.trim();
+    const contact = document.getElementById('reg-contact').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const school = document.getElementById('reg-school').value.trim();
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-        showToast('Ukuran file maksimal 5MB', 'error');
-        event.target.value = '';
+    if (!name || !contact || !password) {
+        showToast('Mohon lengkapi semua field wajib.', 'warning');
         return;
     }
 
-    // Validate file type
-    const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/jpg'];
-    if (!allowedTypes.includes(file.type)) {
-        showToast('Format file harus PDF atau Image (JPG/PNG)', 'error');
-        event.target.value = '';
+    if (password.length < 8) {
+        showToast('Password minimal 8 karakter.', 'warning');
         return;
     }
 
-    const preview = document.getElementById('file-preview');
-    const nameText = document.getElementById('file-name-text');
-    preview.classList.remove('hidden');
-    nameText.innerText = file.name;
-
-    // Success animation
-    preview.classList.add('scale-105');
-    setTimeout(() => preview.classList.remove('scale-105'), 200);
-
-    showToast('Berkas berhasil dipilih', 'success');
-}
-
-/**
- * Submit school registration to the backend API
- */
-async function submitRegistration() {
-    const schoolData = {
-        name: document.getElementById('school-name').value.trim(),
-        city: document.getElementById('school-city').value.trim(),
-        grade_level: document.getElementById('school-grade').value,
-        principal_name: document.getElementById('school-principal').value.trim(),
-        total_classes: parseInt(document.getElementById('school-classes').value, 10)
+    const payload = {
+        role,
+        name,
+        contact,
+        password,
+        school: role === 'teacher' ? school : null
     };
 
-    // Validate all fields
-    if (!schoolData.name || !schoolData.city || !schoolData.grade_level || !schoolData.principal_name || !schoolData.total_classes) {
-        showToast('Mohon lengkapi semua data sekolah', 'warning');
-        return;
-    }
-
-    try {
-        const result = await apiCall('/schools', {
-            method: 'POST',
-            body: JSON.stringify(schoolData),
-        });
-
-        showToast('Sekolah berhasil didaftarkan! 🎉', 'success', 5000);
-
-        // Handle file upload if present
-        const fileInput = document.getElementById('file-upload');
-        if (fileInput.files.length > 0) {
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            formData.append('school_id', result.id);
-
-            await fetch(`${API_BASE}/schools/upload`, {
-                method: 'POST',
-                body: formData,
-            });
+    // Simulate API call and redirect
+    showToast('Berhasil masuk! Mengarahkan ke dashboard...', 'success');
+    
+    setTimeout(() => {
+        if (role === 'parent') {
+            window.location.href = 'dashboard-parent.html';
+        } else {
+            window.location.href = 'dashboard-teacher.html';
         }
-
-        // Redirect to school dashboard after delay
-        setTimeout(() => {
-            window.location.href = `school-dashboard.html?id=${result.id}`;
-        }, 1500);
-
-    } catch (error) {
-        console.error('Registration failed:', error);
-    }
+    }, 1500);
 }

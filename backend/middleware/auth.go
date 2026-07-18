@@ -1,72 +1,48 @@
 package middleware
 
 import (
+	"context"
 	"net/http"
 	"strings"
-	"time"
 
-	"jagapilar-backend/database"
+	"github.com/golang-jwt/jwt/v5"
 )
 
-// Auth middleware validates token-based authentication
-// Checks the Authorization header for a valid access token
+var jwtKey = []byte("JAGAPILAR_SECRET_KEY_CHANGE_ME_IN_PROD")
+
+type Claims struct {
+	UserID string `json:"user_id"`
+	Role   string `json:"role"`
+	jwt.RegisteredClaims
+}
+
+type contextKey string
+
+const UserIDKey contextKey = "userID"
+const RoleKey contextKey = "role"
+
+// Auth is a middleware that extracts JWT from Authorization header
+// and puts UserID and Role into the request context.
+// Endpoints can still process the request if token is missing,
+// it's up to the handler to enforce if they need authentication.
 func Auth(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Skip auth for public endpoints
-		publicPaths := []string{
-			"/api/schools",
-			"/api/assessment/items",
-			"/api/auth/",
-		}
-		for _, p := range publicPaths {
-			if strings.HasPrefix(r.URL.Path, p) {
-				next.ServeHTTP(w, r)
-				return
+		authHeader := r.Header.Get("Authorization")
+		if authHeader != "" && strings.HasPrefix(authHeader, "Bearer ") {
+			tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+			
+			claims := &Claims{}
+			token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+				return jwtKey, nil
+			})
+
+			if err == nil && token.Valid {
+				// Token is valid, put claims into context
+				ctx := context.WithValue(r.Context(), UserIDKey, claims.UserID)
+				ctx = context.WithValue(ctx, RoleKey, claims.Role)
+				r = r.WithContext(ctx)
 			}
 		}
-
-		// Also skip for non-API paths (static files)
-		if !strings.HasPrefix(r.URL.Path, "/api/") {
-			next.ServeHTTP(w, r)
-			return
-		}
-
-		// Extract token from Authorization header
-		authHeader := r.Header.Get("Authorization")
-		if authHeader == "" {
-			http.Error(w, `{"error":"Token diperlukan"}`, http.StatusUnauthorized)
-			return
-		}
-
-		token := strings.TrimPrefix(authHeader, "Bearer ")
-		if token == authHeader {
-			http.Error(w, `{"error":"Format token tidak valid"}`, http.StatusUnauthorized)
-			return
-		}
-
-		// Validate token against database
-		var informantID, childID, role string
-		var expiresAt *time.Time
-		err := database.DB.QueryRow(
-			"SELECT id, child_id, role, token_expires_at FROM informants WHERE access_token = $1",
-			token,
-		).Scan(&informantID, &childID, &role, &expiresAt)
-
-		if err != nil {
-			http.Error(w, `{"error":"Token tidak valid"}`, http.StatusUnauthorized)
-			return
-		}
-
-		// Check expiration
-		if expiresAt != nil && expiresAt.Before(time.Now()) {
-			http.Error(w, `{"error":"Token sudah kedaluwarsa"}`, http.StatusUnauthorized)
-			return
-		}
-
-		// Set variables in header for downstream handlers
-		r.Header.Set("X-Informant-ID", informantID)
-		r.Header.Set("X-Child-ID", childID)
-		r.Header.Set("X-User-Role", role)
 
 		next.ServeHTTP(w, r)
 	})

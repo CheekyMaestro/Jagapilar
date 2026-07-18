@@ -1,5 +1,5 @@
 // ============================================================
-// JAGAPILAR Kids — Assessment Logic
+// JAGAPILAR Kids — Assessment Logic (Neuro ID Flow)
 // ============================================================
 
 const STUDENT_ITEMS = [
@@ -11,55 +11,44 @@ const STUDENT_ITEMS = [
     { code: 'M6', text: 'Kalau lagi ada masalah, aku lebih milih main gadget sendirian daripada cerita ke orang tua atau guru.', isReverse: false, construct: 'Self-isolation' },
 ];
 
-let currentToken = null;
-let currentSessionId = null;
+let currentNeuroId = null;
 let currentQuestionIndex = 0;
 let answers = {}; // { 'M1': 3, 'M2': 5, ... }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+    // If Neuro ID passed in URL, auto-start
     const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
-    
-    if (token) {
-        currentToken = token;
-        try {
-            // Validate Token
-            const res = await apiCall('/auth/validate-token', {
-                method: 'POST',
-                body: JSON.stringify({ token: token })
-            });
-            
-            if (res && res.valid && res.role === 'student') {
-                // Create session
-                const sessionRes = await fetch(`${API_BASE}/assessment/sessions`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                
-                if(sessionRes.ok) {
-                    const session = await sessionRes.json();
-                    currentSessionId = session.id;
-                    
-                    // Show questions
-                    document.getElementById('loading-section').classList.add('hidden');
-                    document.getElementById('question-section').classList.remove('hidden');
-                    renderQuestion();
-                } else {
-                    showError('Gagal membuat sesi asesmen.');
-                }
-            } else {
-                showError('Link asesmen tidak valid atau bukan untuk murid.');
-            }
-        } catch(e) {
-            showError('Gagal memvalidasi link asesmen.');
-        }
-    } else {
-        // Demo mode
-        document.getElementById('loading-section').classList.add('hidden');
-        document.getElementById('question-section').classList.remove('hidden');
-        renderQuestion();
+    const id = params.get('neuro_id');
+    if (id) {
+        document.getElementById('neuro-id-input').value = id;
+        startAssessment();
     }
 });
+
+function startAssessment() {
+    const input = document.getElementById('neuro-id-input').value.trim().toUpperCase();
+    if (!/^NP-[A-Z0-9]{4}-[A-Z0-9]{4}$/.test(input)) {
+        showToast('Format Neuro ID salah. Harusnya NP-XXXX-XXXX', 'warning');
+        return;
+    }
+    
+    currentNeuroId = input;
+    document.getElementById('entry-section').classList.add('hidden');
+    document.getElementById('loading-section').classList.remove('hidden');
+    document.getElementById('loading-section').classList.add('flex');
+
+    // Simulate API validation
+    setTimeout(() => {
+        document.getElementById('loading-section').classList.add('hidden');
+        document.getElementById('loading-section').classList.remove('flex');
+        document.getElementById('question-section').classList.remove('hidden');
+        
+        // Show greeting
+        showToast('Halo! Selamat datang di misi JAGAPILAR.', 'success');
+        
+        renderQuestion();
+    }, 1500);
+}
 
 function showError(msg) {
     document.getElementById('loading-section').innerHTML = `
@@ -131,21 +120,8 @@ function selectEmoji(element, value) {
     });
     element.classList.add('active');
 
-    // Progressive save
-    if (currentSessionId && currentToken) {
-        fetch(`${API_BASE}/assessment/responses`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentToken}`
-            },
-            body: JSON.stringify({
-                session_id: currentSessionId,
-                item_code: item.code,
-                raw_score: value
-            })
-        }).catch(e => console.log('Progressive save fail:', e));
-    }
+    // Simulate Progressive save
+    console.log(`Saved item ${item.code} with value ${value} for Neuro ID ${currentNeuroId}`);
 
     updateNextButtonState();
     
@@ -207,24 +183,7 @@ function submitAssessment() {
     }
 
     // Submit to API
-    if (currentToken) {
-        fetch(`${API_BASE}/assessment/submit`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentToken}`
-            },
-            body: JSON.stringify({
-                pillar: 'student',
-                total_score: totalScore,
-                zone: 'unknown', // backend will calculate and ignore this anyway for single pillar
-                items: itemScores.map(s => ({
-                    item_code: s.code,
-                    raw_score: s.rawScore,
-                }))
-            })
-        }).catch(e => console.log(e));
-    }
+    console.log(`Submitted for ${currentNeuroId}`, itemScores);
 
     // Show Success Screen
     document.getElementById('question-section').classList.add('hidden');

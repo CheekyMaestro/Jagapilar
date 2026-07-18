@@ -1,0 +1,239 @@
+PRD REVISI · JAGAPILAR
+Alur User Berbasis Neuro ID (Parent-First)
+Revisi menyeluruh atas alur pengguna: dari model sekolah-first ke model parent-first berbasis Neuro ID sebagai identitas utama anak.
+Status: Revisi Major v1.0
+Menggantikan: JAGAPILAR_PRD_Addendum_UserFlow_Login.md
+Tetap berlaku: JAGAPILAR_PRD_Final_v2.md (bagian scoring, chatbot, tech stack — tidak berubah)
+
+1. Ringkasan Perubahan Besar
+Alur user JAGAPILAR direvisi menyeluruh berdasarkan masukan client. Motivasi utama: menghilangkan risiko penyalahgunaan data anak yang muncul di alur sebelumnya (di mana daftar nama anak bisa terlihat lewat dropdown publik) dengan cara memindahkan titik kendali data ke orang tua — bukan ke sekolah.
+Yang berubah
+Titik masuk sistem — Sebelumnya sekolah mendaftar dulu → sekarang orang tua langsung mendaftarkan anak; sekolah menjadi opsional (sunnah, bukan wajib).
+Identitas utama anak — Sebelumnya kombinasi (sekolah, kelas, nama) → sekarang Neuro ID sebagai primary identifier yang unik & tidak berbasis nama.
+Peran sekolah — Sebelumnya gerbang otorisasi wajib → sekarang hanya konteks agregasi opsional untuk laporan sekolah.
+Verifikasi consent — Sebelumnya via institusi (kepala sekolah) → sekarang berbasis pernyataan orang tua saat mendaftar (consent tetap harus ada, tapi diverifikasi offline sebelum masuk aplikasi).
+Cara guru & anak masuk ke asesmen — Sebelumnya login dengan pilih-dari-daftar → sekarang cukup memasukkan Neuro ID yang dibagikan orang tua.
+Struktur admin — Sebelumnya hanya Peneliti Inti sebagai admin tunggal → sekarang dua tingkat: Admin Sekolah (agregat per-sekolah) dan Admin Website/Peneliti Inti (agregat antar-sekolah).
+Yang TIDAK berubah
+Tech stack (Next.js, Supabase, Vercel, dst.) — tetap seperti PRD Final v2.
+Struktur asesmen 18-item 3-pilar & aturan scoring — tetap.
+Aturan zona (Hijau/Kuning/Merah) dan konvergensi — tetap.
+Aturan submit hanya boleh sekali per (Neuro ID × peran) — tetap (FR-1.2 di v2).
+Aturan skor & zona hanya dihitung setelah ketiganya submit — tetap (FR-3.3 di v2).
+Chatbot psikoedukasi orang tua — tetap (UC-10 di v2), sekarang muncul di dashboard 360° orang tua.
+Catatan penting: Dokumen ini menggantikan addendum sebelumnya (login berbasis sekolah). PRD Final v2 sebagai keseluruhan tetap berlaku — hanya bagian alur user (aktor, use case, entry point) yang dirombak di sini.
+2. Prinsip Desain Baru
+Orang tua adalah pemilik utama data anak. Neuro ID dibuat oleh orang tua dan dibagikan atas kehendaknya. Tidak ada institusi (sekolah, peneliti) yang bisa membuat Neuro ID atas nama orang tua.
+Consent diverifikasi offline. Aplikasi mengandalkan pernyataan orang tua bahwa persetujuan dari anak dan diri sendiri sudah diambil offline sebelum menekan tombol "Buat Neuro ID". Prosedur consent tertulis (Etika Pengambilan Data, Bagian 4 dokumen sumber) tetap dilakukan di luar aplikasi.
+Sekolah opsional, bukan syarat. Anak bisa punya Neuro ID tanpa terhubung ke sekolah mana pun. Menghubungkan Neuro ID ke sekolah hanya untuk keperluan agregat sekolah, tidak mempengaruhi kemampuan mengisi asesmen atau melihat hasil.
+Dashboard hasil = data pribadi anak, bukan data sekolah. Hanya orang tua dan guru yang terlibat pada Neuro ID tersebut yang bisa melihat dashboard 360°. Admin Sekolah dan Admin Website tidak pernah melihat hasil per-anak, hanya agregat.
+Minimum agregat untuk mencegah re-identifikasi. Dashboard Admin Sekolah dan Admin Website hanya menampilkan persentase kalau sampel cukup besar (usulan: minimal 5 Neuro ID), agar identitas individu tidak bocor lewat angka agregat.
+3. Aktor & Peran
+Aktor
+Peran & Wewenang
+Cara Masuk Sistem
+Orang Tua / Wali
+Membuat Neuro ID anak, mengisi pilar asesmen "Orang Tua", membagikan Neuro ID ke guru & anak, melihat dashboard 360°, opsional menghubungkan ke sekolah, mengakses chatbot.
+Registrasi akun (email/no. HP + password) → tambah anak → dapat Neuro ID.
+Anak (9–12 th)
+Mengisi pilar asesmen "Anak", didampingi orang tua atau guru. Tidak melihat skor.
+Masukkan Neuro ID di halaman /isi-anak (idealnya didampingi orang dewasa).
+Guru / Wali Kelas
+Mengisi pilar asesmen "Guru" untuk anak yang Neuro ID-nya dibagikan oleh orang tua. Melihat dashboard 360° anak-anak yang diampu.
+Registrasi akun guru → masukkan Neuro ID yang diterima dari orang tua → asesmen tersedia.
+Admin Sekolah
+Mengelola pendaftaran sekolah, melihat persentase Hijau/Kuning/Merah untuk sekolahnya (agregat, minimal 5 Neuro ID).
+Registrasi sekolah → verifikasi oleh Admin Website → login.
+Admin Website / Peneliti Inti
+Memverifikasi pendaftaran sekolah, melihat perbandingan agregat antar-sekolah, mengelola konten psikoedukasi, akses audit keamanan.
+Akun internal tim riset, tidak self-registration.
+4. Konsep Neuro ID
+Neuro ID adalah identitas utama (primary identifier) untuk setiap anak dalam sistem JAGAPILAR. Semua data asesmen, skor, zona, dan referensi antar-tabel menggunakan Neuro ID — bukan nama anak. Nama anak hanya disimpan sebagai metadata untuk kemudahan orang tua & guru mengenali anak yang tepat, dan tidak pernah muncul di halaman publik/dropdown.
+4.1 Format Neuro ID
+Format usulan: NP-XXXX-XXXX (contoh: NP-A3F7-K2M9) — 8 karakter alfanumerik dengan pemisah tanda hubung.
+Menggunakan character set tanpa karakter ambigu (tidak ada 0/O, 1/I/L) untuk mengurangi salah baca saat orang tua membacakan Neuro ID ke guru.
+Ruang kombinasi ~ 32^8 ≈ 1,1 triliun — cukup untuk mencegah tebakan acak, tapi tetap mudah dibaca & disalin manusia.
+Case-insensitive di input (huruf kecil/besar dianggap sama) untuk kenyamanan pengguna.
+4.2 Sifat Neuro ID
+Unik seumur hidup Neuro ID — sekali dibuat, tidak diubah.
+Tidak mengandung informasi identitas (bukan berbasis nama, tanggal lahir, atau NIS).
+Bisa dibagikan lewat WhatsApp/SMS/tulisan tanpa langsung membocorkan identitas anak — nama hanya diketahui oleh yang punya akses ke akun terkait.
+Berfungsi ganda: sebagai identifier internal database dan sebagai "kunci" yang dibagikan untuk mengisi asesmen.
+5. Alur User Detail
+UC-R1 · Orang Tua Membuat Neuro ID Anak
+Prasyarat: Orang tua sudah berdiskusi dengan anak, keduanya setuju mengikuti asesmen. Consent tertulis (jika tim mensyaratkan) sudah disiapkan offline.
+Alur utama:
+Orang tua membuka website JAGAPILAR → menekan "Daftar sebagai Orang Tua".
+Membuat akun: nama orang tua, email/no. HP, password.
+Setelah login, di dashboard orang tua ada tombol "+ Tambah Anak".
+Mengisi form anak: nama anak, tahun lahir, jenis kelamin.
+Wajib centang: "Saya menyatakan bahwa anak saya dan saya sudah menyetujui mengikuti asesmen JAGAPILAR" (checkbox eksplisit, timestamp tersimpan).
+Sistem generate Neuro ID → tampilkan ke orang tua: "Neuro ID anak Anda: NP-XXXX-XXXX. Simpan & bagikan ke guru anak dan ke anak Anda untuk mengisi asesmen."
+Neuro ID juga permanen tersedia di dashboard orang tua (bisa dilihat/disalin kapan saja).
+Exception: Kalau checkbox consent tidak dicentang, tombol "Buat Neuro ID" nonaktif. Kalau orang tua mendaftar 2 anak dengan nama yang mirip, sistem tidak menghalangi — Neuro ID adalah pembedanya, bukan nama.
+UC-R2 · Orang Tua Mengisi Pilar Orang Tua
+Setelah Neuro ID dibuat, di dashboard orang tua muncul kartu anak dengan status "Belum mulai asesmen". Klik → masuk ke form 6 item pilar Orang Tua (sama seperti UC-02 di v2, dengan progressive save). Setelah submit, status pilar Orang Tua = "Selesai", dan sistem menunggu 2 pilar lain.
+UC-R3 · Orang Tua Membagikan Neuro ID ke Guru & Anak
+Ini adalah proses offline (WhatsApp, SMS, atau tulisan). Sistem hanya menyediakan:
+Tombol "Salin Neuro ID" di dashboard orang tua.
+Tombol "Bagikan via WhatsApp" (menggunakan share intent bawaan browser) dengan template pesan otomatis: "Halo, tolong bantu isi asesmen JAGAPILAR untuk anak saya [nama]. Neuro ID: NP-XXXX-XXXX. Silakan buka [link] dan pilih peran Anda."
+Panduan singkat: satu Neuro ID hanya untuk satu guru & satu anak — jangan dibagikan ke banyak orang.
+UC-R4 · Guru Mengisi Pilar Guru
+Prasyarat: Guru sudah menerima Neuro ID dari orang tua.
+Guru membuka website → "Daftar/Login sebagai Guru".
+Registrasi akun guru (nama, email/no. HP, password, sekolah tempat mengajar (opsional untuk pelaporan)).
+Setelah login, di dashboard guru ada tombol "+ Tambah Neuro ID Murid".
+Masukkan Neuro ID → sistem validasi format & keberadaan → tampilkan info minimal: nama anak, tahun lahir (untuk konfirmasi guru masuk ke anak yang benar).
+Guru konfirmasi "Ya, saya wali kelas / guru anak ini" → Neuro ID muncul di dashboard guru.
+Klik anak → isi 6 item pilar Guru (sama seperti UC-02 di v2).
+Guru bisa menambah banyak Neuro ID dari banyak murid ke dashboard yang sama — satu akun guru, banyak Neuro ID.
+Catatan: Sistem tidak memverifikasi bahwa guru ini benar-benar guru anak tersebut — verifikasi ada di sisi orang tua yang memilih dengan sengaja hanya membagikan Neuro ID ke guru asli. Ini disengaja: sistem tidak bisa memverifikasi hubungan sosial di luar sistem, jadi kepercayaan didelegasikan ke orang tua.
+UC-R5 · Anak Mengisi Pilar Anak
+Prasyarat: Neuro ID sudah dibagikan orang tua ke anak. Anak sebaiknya didampingi orang dewasa (orang tua di rumah atau guru di sekolah) — konsisten dengan Etika Pengambilan Data.
+Anak (atau pendamping) membuka website → halaman "/isi-anak".
+Masukkan Neuro ID → sistem validasi.
+Tampilkan konfirmasi: "Halo [nama anak], siap mengisi asesmen?" — kalau nama tidak sesuai, anak bisa kembali ke Neuro ID yang benar.
+Anak mulai isi 6 item pilar Anak (bahasa sederhana, progressive save).
+Setelah submit, halaman terima kasih generik — anak tidak melihat skor atau zona (FR-4.1 di v2).
+Alur pengisian anak tidak butuh registrasi akun. Anak hanya masuk sekali (mengisi asesmen 1 kali per Neuro ID), jadi tidak perlu identitas persisten di sistem.
+UC-R6 · Dashboard 360° (Orang Tua & Guru)
+Setelah ketiga pilar (Orang Tua + Guru + Anak) submit, sistem menghitung skor komposit & zona (sesuai UC-03 di v2, tidak berubah).
+Siapa yang bisa melihat:
+Orang tua yang membuat Neuro ID (di dashboard orang tua).
+Guru yang menambahkan Neuro ID ke dashboardnya (dan sudah mengisi pilar Guru untuk anak itu).
+Yang ditampilkan:
+Skor komposit + zona (Hijau/Kuning/Merah — hanya warna, sesuai keputusan client).
+Skor per pilar (Orang Tua, Guru, Anak) dan kondisi konvergensi (semua zona sama vs beda).
+Kalau zona Merah atau non-konvergen: tampilan "Perlu Rujukan" + panduan menghubungi psikolog/BK (konten dari materi buku saku).
+Untuk orang tua: akses ke chatbot psikoedukasi (UC-10 di v2, tidak berubah).
+Untuk guru: kalau guru punya banyak Neuro ID, dashboard menampilkan daftar semua dengan status masing-masing (mirip UC-06 di v2, tapi entry-nya Neuro ID, bukan kelas).
+UC-R7 · (Opsional) Menghubungkan Neuro ID ke Sekolah
+Sifat: Opsional (sunnah). Anak yang tidak dihubungkan tetap bisa isi asesmen & lihat hasil dengan normal. Menghubungkan hanya berdampak pada apakah Neuro ID dimasukkan ke agregat sekolah.
+Di dashboard orang tua, kartu anak punya tombol "Hubungkan ke sekolah".
+Klik → dropdown pilih sekolah dari daftar sekolah yang sudah terdaftar & terverifikasi (status "active").
+Orang tua pilih sekolah → sistem kirim notifikasi ke Admin Sekolah terkait: "Ada permintaan penambahan Neuro ID NP-XXXX-XXXX (nama anak, kelas dari input orang tua)".
+Admin Sekolah bisa Approve/Reject di dashboard Admin Sekolah.
+Approve → Neuro ID masuk ke `school_children` untuk sekolah tersebut → agregat sekolah bertambah 1 sampel.
+Reject → orang tua diberi tahu; Neuro ID tetap valid, hanya tidak masuk agregat sekolah.
+Orang tua bisa "unlink" kapan saja tanpa alasan → Neuro ID keluar dari agregat sekolah.
+UC-R8 · Admin Sekolah Melihat Agregat
+Prasyarat: Sekolah sudah terdaftar & diverifikasi oleh Admin Website; sudah ada minimal 5 Neuro ID terhubung yang sudah selesai asesmen (3 pilar lengkap).
+Yang ditampilkan:
+Persentase Zona Hijau / Kuning / Merah dari total Neuro ID terhubung yang sudah selesai asesmen.
+Jumlah Neuro ID terhubung, jumlah sudah selesai, jumlah menunggu pilar lain.
+Trend per bulan (kalau data cukup panjang).
+Yang TIDAK ditampilkan:
+Nama anak individu, Neuro ID individu, atau skor per-anak.
+Data kelas/anak tertentu kalau sampelnya < 5 (mencegah re-identifikasi).
+UC-R9 · Admin Website Melihat Perbandingan Antar-Sekolah
+Aktor: Peneliti Inti / tim JAGAPILAR. Dashboard tingkat tertinggi.
+Yang ditampilkan:
+Ranking sekolah berdasarkan persentase Zona Hijau (dari yang paling tinggi ke terendah).
+Ranking terbalik: sekolah dengan persentase Zona Merah tertinggi (perlu perhatian).
+Filter berdasarkan wilayah, tipe sekolah (kalau ada), jumlah sampel minimum.
+Antrian verifikasi pendaftaran sekolah baru.
+Antrian audit chatbot (pesan yang di-flag, dari UC-10 v2).
+Yang TIDAK ditampilkan:
+Data individual anak (konsisten dengan prinsip §2.4).
+Sekolah dengan sampel < 5 (agregat tidak reliable, potensi re-identifikasi).
+6. Skema Database Revisi
+Perubahan terhadap skema di Bagian 5 dokumen sumber dan PRD v2:
+6.1 Tabel Baru / Diperbarui
+parents (baru) — akun orang tua: id, name, contact (email/no. HP, reversible), password_hash, created_at.
+teachers (baru) — akun guru: id, name, contact, password_hash, school_id (nullable — guru bisa daftar tanpa mengisi sekolah), created_at.
+children (revisi major) — primary identifier: neuro_id (TEXT UNIQUE, format NP-XXXX-XXXX). Kolom: neuro_id, parent_id (FK ke parents — pemilik), full_name, birth_year, sex, consent_declared_at (timestamp pernyataan consent orang tua), created_at. Kolom anon_code lama tetap boleh disimpan untuk export riset, tapi Neuro ID jadi primary.
+teacher_children (baru) — relasi guru ke Neuro ID: id, teacher_id, neuro_id, added_at.
+school_children (baru) — relasi opsional Neuro ID ke sekolah: id, neuro_id, school_id, requested_at, approved_at, approved_by (admin sekolah), status ('pending','approved','rejected').
+schools (tetap dari addendum sebelumnya) — pendaftaran sekolah dengan status verifikasi.
+school_admins (baru) — akun Admin Sekolah: id, name, contact, password_hash, school_id, created_at.
+website_admins (baru) — akun Admin Website / Peneliti Inti: id, name, contact, password_hash, role_level ('admin','super_admin'), created_at.
+informants (diperbarui) — sekarang neuro_id sebagai FK utama (menggantikan child_id lama). Untuk pilar Orang Tua, informant_id = parent_id. Untuk pilar Guru, informant_id = teacher_id + neuro_id (unique). Untuk pilar Anak, informant_id anonim/generik per sesi.
+6.2 Yang Ditinggalkan dari Skema Lama
+Kolom access_token per (child × role) — tidak dipakai lagi. Autentikasi sekarang via akun (parent/teacher/admin) atau Neuro ID langsung (anak).
+Tabel classes & class_teachers dari addendum sebelumnya — tidak dipakai. Struktur kelas tidak lagi jadi bagian sistem inti (bisa opsional di masa depan kalau Admin Sekolah butuh breakdown per kelas).
+6.3 Row Level Security (Ringkasan)
+parents hanya bisa akses children yang parent_id-nya cocok.
+teachers hanya bisa akses children lewat teacher_children yang teacher_id-nya cocok.
+school_admins hanya bisa akses agregat via school_children.school_id yang cocok.
+website_admins bisa akses semua agregat, tapi tidak data individu (dienforce di query, bukan di RLS baris).
+Anak (tanpa akun) hanya bisa submit ke assessment_sessions yang neuro_id-nya sama dengan yang di-input dan role='student'.
+7. Functional Requirements Tambahan
+ID
+Requirement
+FR-R1
+Neuro ID digenerate menggunakan character set aman (tanpa 0/O/1/I/L), format NP-XXXX-XXXX, dan diverifikasi keunikannya sebelum ditulis ke DB.
+FR-R2
+Checkbox consent declaration (UC-R1 langkah 5) wajib dicentang sebelum tombol "Buat Neuro ID" aktif. Timestamp centang tersimpan di `consent_declared_at`.
+FR-R3
+Sistem tidak boleh menampilkan daftar Neuro ID/nama anak di dropdown publik mana pun. Guru & Admin Sekolah hanya bisa menambah lewat input eksplisit Neuro ID yang dibagikan pemilik.
+FR-R4
+Validasi input Neuro ID: sistem hanya mengonfirmasi keberadaan Neuro ID, tidak pernah membocorkan Neuro ID lain yang mirip (mencegah enumeration attack).
+FR-R5
+Rate limit di endpoint validasi Neuro ID: maksimal 10 percobaan gagal per IP per jam, 100 percobaan gagal per akun guru per hari (mencegah brute-force).
+FR-R6
+Dashboard Admin Sekolah hanya menampilkan agregat kalau ada minimal 5 Neuro ID terhubung yang selesai asesmen. Kurang dari itu: pesan "Data belum cukup untuk laporan agregat".
+FR-R7
+Dashboard Admin Website tidak menampilkan sekolah dengan sampel < 5 di ranking; sekolah tersebut muncul di daftar "Belum cukup sampel".
+FR-R8
+Orang tua bisa unlink Neuro ID dari sekolah kapan saja tanpa alasan (self-service, satu klik). Efeknya: Neuro ID keluar dari school_children dan agregat sekolah berkurang di kalkulasi berikutnya.
+FR-R9
+Guru yang menambahkan Neuro ID ke dashboardnya wajib mencentang konfirmasi "Saya benar guru anak ini". Ini penanda niat, bukan verifikasi, tapi tercatat di audit_log kalau kemudian ada masalah.
+FR-R10
+Kalau Neuro ID sudah lengkap 3 pilar dan dashboard sudah muncul, guru baru tidak bisa lagi mengisi pilar Guru untuk Neuro ID itu (satu pilar Guru per Neuro ID) — tapi bisa menambah Neuro ID ke dashboardnya sekadar untuk melihat hasil kalau orang tua membagikan Neuro ID setelah asesmen selesai.
+FR-R11
+Semua akun (parent/teacher/school_admin/website_admin) menggunakan Supabase Auth dengan email/password + email verification. Password minimal 8 karakter, campur huruf & angka.
+8. Isu Kritis untuk Diputuskan Tim
+8.1 Tidak Ada Verifikasi "Benar Orang Tua"
+Alur baru ini memindahkan risiko dari "orang asing memilih anak dari dropdown publik" ke "orang asing mendaftarkan anak yang bukan anaknya". Yang kedua jauh lebih sulit dilakukan (butuh niat aktif, akun terverifikasi email, dan tidak menghasilkan akses ke data anak lain), tapi bukan nol.
+Skenario risiko: Seseorang mendaftarkan anak orang lain (mis. anak tetangga) tanpa sepengetahuan orang tua asli, mengisi pilar Orang Tua, membagikan Neuro ID ke oknum yang berpura-pura jadi guru & anak. Hasilnya: entri palsu di data riset.
+Mitigasi yang sudah ada di desain:
+Consent declaration eksplisit (FR-R2) — pemalsuan jadi tindakan sadar dengan bukti timestamp.
+Email verification wajib (FR-R11) — pendaftar tidak bisa anonim.
+Data palsu hanya merusak dataset risetnya sendiri, tidak membocorkan data anak lain — karena tiap akun terisolasi.
+Yang tim perlu putuskan: Apakah mitigasi di atas cukup untuk piloting, atau tim ingin menambah verifikasi tambahan (misal: kode undangan dari Peneliti Inti untuk orang tua yang boleh mendaftar)? Rekomendasi teknis: untuk piloting terbatas (~100 anak) dengan pendekatan sosialisasi via sekolah, mitigasi yang ada sudah cukup. Untuk fase pasca-piloting kalau website dibuka publik, verifikasi tambahan wajib.
+8.2 Consent Riset vs Consent Aplikasi
+Etika Pengambilan Data (Bagian 4 dokumen sumber) menyebut: consent tertulis orang tua/wali + izin institusi (kepala sekolah). Dengan alur baru ini, izin institusi jadi opsional (karena sekolah opsional). Ini pergeseran metodologi riset, bukan cuma teknis.
+Yang perlu diperjelas tim (koordinasi dengan Dr. Ike Herdiana):
+Apakah consent orang tua digital (checkbox di aplikasi) cukup memenuhi standar Komite Etik Universitas Airlangga, atau tetap butuh dokumen fisik tanda tangan?
+Kalau anak yang mengisi asesmen tidak terhubung ke sekolah (murni self-served orang tua), apakah data mereka tetap valid untuk publikasi hasil riset PKM?
+Rekomendasi teknis: sistem menyimpan `consent_declared_at` sebagai bukti digital, TAPI Peneliti Inti tetap mengumpulkan dokumen consent fisik untuk anak-anak yang direkrut lewat sekolah pilot (subset yang jadi data utama publikasi). Anak-anak yang mendaftar mandiri tanpa jalur sekolah bisa masuk kategori data sekunder/eksploratori.
+8.3 Anak Bisa Mengisi Sendiri di Rumah
+Alur UC-R5 tidak secara teknis menghalangi anak mengisi sendiri di rumah tanpa pendampingan orang dewasa. Etika Pengambilan Data mensyaratkan pendampingan.
+Opsi:
+SOP saja (dokumentasi) — orang tua diminta mendampingi, tidak dienforce sistem. Cocok untuk piloting.
+Enforce lewat sistem — pilar Anak baru muncul di form kalau orang tua sudah submit pilar Orang Tua duluan. Ini bikin urutan wajib (Ortu → Anak) tanpa perlu passcode. Rekomendasi teknis: adopsi opsi ini karena murah & masuk akal.
+Kode harian dari guru/orang tua — paling ketat, tapi berlebihan untuk piloting kecil.
+8.4 Data Anak yang Tidak Pernah Selesai 3 Pilar
+Kalau orang tua sudah buat Neuro ID + isi pilar Orang Tua, tapi tidak pernah menemukan guru yang bersedia mengisi (atau anak tidak pernah mengisi), data pilar Orang Tua tersimpan tanpa hasil dashboard.
+Konsisten dengan aturan v2 (FR-3.3): skor tidak dihitung tanpa 3 pilar lengkap. Yang perlu diputuskan: berapa lama Neuro ID "menggantung" seperti ini sebelum dianggap ditinggalkan? Usulan: setelah 60 hari tanpa progress pilar baru, kirim reminder ke orang tua. Setelah 180 hari, tandai status "incomplete_abandoned" (tetap tersimpan, tidak muncul di dashboard aktif orang tua kecuali dibuka manual).
+8.5 Bagaimana Kalau Orang Tua Cerai / Beda Rumah
+Neuro ID terikat ke 1 akun orang tua (FK parent_id). Kalau kedua orang tua sama-sama ingin akses dashboard:
+Opsi minimal: hanya 1 orang tua yang jadi pemilik Neuro ID, orang tua lain hanya bisa lihat dengan membuka akun bersama (workaround). Cocok untuk piloting.
+Opsi kaya fitur: co-parent invitation — orang tua pemilik bisa mengundang orang tua kedua (email) untuk co-akses. Tidak perlu di piloting, bisa dijadikan roadmap.
+9. Perubahan Dampak pada Dokumen Sebelumnya
+Dokumen ini mengoreksi/mengganti bagian-bagian tertentu di dokumen sebelumnya. Ringkasan:
+Dokumen
+Bagian yang Berubah
+Status
+Bagian 5 dokumen sumber (JAGAPILAR_Dokumentasi_Terpadu.docx)
+Skema access_token per (child × role); Diagram Alur Sistem terkait aktor & entry point.
+Diperbarui (lihat §6 di sini).
+PRD Final v2
+UC-01 (Registrasi Kohort), UC-02 (bagian entry point), UC-06 (Portal Guru — sekarang berbasis Neuro ID), UC-07 (reissue token tidak berlaku).
+Diperbarui pada bagian aktor & alur; scoring, chatbot, tech stack tetap.
+Addendum User Flow Login (login berbasis sekolah)
+Seluruh alur "pilih sekolah → pilih kelas → pilih anak".
+Digantikan penuh oleh dokumen ini.
+Etika Pengambilan Data (Bagian 4 dokumen sumber)
+Prinsip "izin institusi wajib".
+Perlu klarifikasi tim + dosen pembimbing (lihat §8.2).
+10. Pertanyaan Terbuka
+§8.1 mitigasi verifikasi orang tua: setuju cukup dengan consent declaration + email verification untuk piloting, atau tim ingin menambah kode undangan?
+§8.2 consent riset: perlu konfirmasi Dr. Ike apakah checkbox digital + tanpa izin institusi wajib memenuhi standar Komite Etik.
+§8.3 pendampingan anak: setuju pakai enforcement lewat urutan (Ortu → Anak), atau SOP saja?
+§8.4 abandonment: setuju threshold 60/180 hari, atau tim punya angka berbeda?
+Format Neuro ID: setuju NP-XXXX-XXXX, atau tim punya preferensi (mis. prefix beda per angkatan riset, panjang beda)?
+Minimum sampel agregat (5): setuju atau tim mau angka lain? Standar akademik seringnya 10, tapi untuk piloting kecil 5 lebih realistis.
+Akun Admin Website: siapa saja di tim yang jadi Admin Website? Rekomendasi: Athayya (Project Lead) + Ariq (Kebijakan & Tata Kelola).
+
+Dokumen ini menggantikan addendum login berbasis sekolah. Semua bagian teknis di PRD v2 (tech stack, scoring, chatbot) tetap berlaku tanpa perubahan.

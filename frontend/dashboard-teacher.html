@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Dashboard Guru | JAGAPILAR</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="bg-surface font-body-md text-on-surface">
+    <!-- TopNavBar -->
+    <header class="bg-surface border-b border-outline-variant h-[90px] w-full sticky top-0 z-50">
+        <div class="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto h-full">
+            <a href="index.html" class="flex items-center gap-4">
+                <img alt="JAGAPILAR Logo" class="h-12 w-auto"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCldyVhV-xrdWAEMnqEK1FEKCt2MExe9gZTkC9ZcIZG_kYV44h_CFOO3EoKq4C5WO2e56HM4VDdvcw4Iw72VT11LIh54lOb-sj5RhuKb-GIDSGQW4w5wewtkAK9fZNJU2iKMF-tQ3pi176StBK1m4FZW_pAoAbOOHbPgCGzlA6PYTk9wNteKYR8V1eDstrx7x6CYeiDmo_x5PKwH8xQxDWTyTQpfDqejMfmcsbqdSOqk2ihJH1_7IC7-LJIJTbfuYA6fik-0j1RgYIG">
+                <span class="font-headline-md text-headline-md font-extrabold text-primary">JAGAPILAR</span>
+            </a>
+            <div class="flex items-center gap-4">
+                <span class="font-label-caps text-on-surface-variant">Halo, Guru</span>
+                <a href="index.html" class="text-primary hover:underline font-label-caps ml-4">KELUAR</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="min-h-screen relative py-10">
+        <div class="max-w-4xl mx-auto px-margin-mobile">
+            <!-- Header -->
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h1 class="font-headline-lg text-primary mb-2">Murid Saya</h1>
+                    <p class="text-on-surface-variant">Tambahkan Neuro ID murid yang diberikan oleh orang tua, dan isi asesmen guru.</p>
+                </div>
+                <button onclick="openModal()" class="bg-primary text-white font-label-caps px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-teal-deep transition">
+                    <span class="material-symbols-outlined">person_add</span>
+                    TAMBAH MURID
+                </button>
+            </div>
+
+            <!-- List Murid -->
+            <div id="students-list" class="grid grid-cols-1 gap-6">
+                <!-- Data murid akan dirender di sini via JS -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal Tambah Murid -->
+    <div id="add-student-modal" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-surface rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b border-outline-variant flex justify-between items-center">
+                <h2 class="font-headline-md text-primary">Tambah Neuro ID Murid</h2>
+                <button onclick="closeModal()" class="text-on-surface-variant hover:text-primary"><span class="material-symbols-outlined">close</span></button>
+            </div>
+            <div class="p-6">
+                <form id="add-student-form" onsubmit="addStudent(event)">
+                    <div class="space-y-4 mb-8">
+                        <div>
+                            <label class="block font-label-caps text-on-surface-variant mb-1">Masukkan Neuro ID</label>
+                            <input id="student-neuro-id" class="w-full border-outline-variant rounded-lg p-3 bg-surface-container-low font-mono tracking-widest text-lg" type="text" placeholder="NP-XXXX-XXXX" required>
+                        </div>
+                    </div>
+
+                    <div class="bg-primary/10 p-4 rounded-lg mb-6 border border-primary/20">
+                        <label class="flex items-start gap-3 cursor-pointer">
+                            <input type="checkbox" id="teacher-confirm" class="mt-1 w-5 h-5 rounded text-primary focus:ring-primary" required>
+                            <span class="text-sm text-on-surface-variant">Saya mengonfirmasi bahwa saya benar-benar adalah wali kelas / guru dari anak pemilik Neuro ID ini.</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="btn-add-student" class="w-full bg-primary text-white font-label-caps py-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition">
+                        TAMBAHKAN KE DASHBOARD
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    <script src="js/dashboard-teacher.js"></script>
+</body>
+
+</html>

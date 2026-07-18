@@ -6,6 +6,17 @@ import (
 
 // ==================== Database Models ====================
 
+// User represents a parent or teacher
+type User struct {
+	ID           string    `json:"id"`
+	Name         string    `json:"name"`
+	EmailContact string    `json:"email_contact"`
+	PasswordHash string    `json:"-"`
+	Role         string    `json:"role"`      // "parent", "teacher"
+	SchoolID     *string   `json:"school_id,omitempty"` // nullable, for teachers
+	CreatedAt    time.Time `json:"created_at"`
+}
+
 // School represents a registered school
 type School struct {
 	ID                    string    `json:"id"`
@@ -18,26 +29,22 @@ type School struct {
 	CreatedAt             time.Time `json:"created_at"`
 }
 
-// Child represents an anonymized child record
+// Child represents a child's profile linked to a Neuro ID
 type Child struct {
 	ID        string    `json:"id"`
-	AnonCode  string    `json:"anon_code"`
-	SchoolID  string    `json:"school_id"`
-	Grade     int       `json:"grade"`
+	NeuroID   string    `json:"neuro_id"`
+	Name      string    `json:"name"`
 	BirthYear int       `json:"birth_year"`
+	Gender    string    `json:"gender"` // "L" or "P"
+	CreatedBy string    `json:"created_by"` // user_id of the parent
 	CreatedAt time.Time `json:"created_at"`
 }
 
-// Informant represents a parent/teacher/student linked to a child
-type Informant struct {
-	ID              string     `json:"id"`
-	ChildID         string     `json:"child_id"`
-	Role            string     `json:"role"` // "parent", "teacher", "student"
-	ContactHash     string     `json:"contact_hash,omitempty"`
-	AccessToken     string     `json:"access_token"`
-	TokenExpiresAt  *time.Time `json:"token_expires_at,omitempty"`
-	ConsentSignedAt *time.Time `json:"consent_signed_at,omitempty"`
-	CreatedAt       time.Time  `json:"created_at"`
+// TeacherChild mapping for teachers adding students to their dashboard
+type TeacherChild struct {
+	TeacherID string    `json:"teacher_id"`
+	ChildID   string    `json:"child_id"`
+	AddedAt   time.Time `json:"added_at"`
 }
 
 // AssessmentItem represents one of the 18 questionnaire items
@@ -54,7 +61,7 @@ type AssessmentItem struct {
 type AssessmentSession struct {
 	ID          string     `json:"id"`
 	ChildID     string     `json:"child_id"`
-	InformantID string     `json:"informant_id"`
+	UserID      *string    `json:"user_id,omitempty"` // null for students
 	Pillar      string     `json:"pillar"`
 	SubmittedAt *time.Time `json:"submitted_at,omitempty"`
 	Status      string     `json:"status"` // "draft", "submitted"
@@ -91,51 +98,53 @@ type CompositeScore struct {
 
 // ==================== Request/Response DTOs ====================
 
-// CreateSchoolRequest is the request body for school registration
-type CreateSchoolRequest struct {
-	Name          string `json:"name"`
-	City          string `json:"city"`
-	GradeLevel    string `json:"grade_level"`
-	PrincipalName string `json:"principal_name"`
-	TotalClasses  int    `json:"total_classes"`
+type RegisterUserRequest struct {
+	Role         string `json:"role"`
+	Name         string `json:"name"`
+	EmailContact string `json:"email_contact"`
+	Password     string `json:"password"`
+	SchoolName   string `json:"school_name,omitempty"` // we will just store this or ignore for now
 }
 
-// CreateChildRequest is the request body for registering a child
+type LoginRequest struct {
+	EmailContact string `json:"email_contact"`
+	Password     string `json:"password"`
+}
+
+type AuthResponse struct {
+	Token string `json:"token"`
+	User  User   `json:"user"`
+}
+
 type CreateChildRequest struct {
-	SchoolID  string `json:"school_id"`
-	Grade     int    `json:"grade"`
+	Name      string `json:"name"`
 	BirthYear int    `json:"birth_year"`
+	Gender    string `json:"gender"`
 }
 
-// CreateInformantRequest is the request body for creating an informant
-type CreateInformantRequest struct {
-	Role        string `json:"role"`
-	ContactHash string `json:"contact_hash,omitempty"`
+type AddChildToTeacherRequest struct {
+	NeuroID string `json:"neuro_id"`
 }
 
-// SubmitResponseRequest is the request body for submitting a single item response
 type SubmitResponseRequest struct {
 	SessionID string `json:"session_id"`
 	ItemCode  string `json:"item_code"`
 	RawScore  int    `json:"raw_score"`
 }
 
-// SubmitAssessmentRequest is the request body for submitting a full assessment
 type SubmitAssessmentRequest struct {
-	Pillar     string               `json:"pillar"`
-	TotalScore float64              `json:"total_score"`
-	Zone       string               `json:"zone"`
-	Items      []ItemSubmission     `json:"items"`
-	ChildID    string               `json:"child_id,omitempty"`
+	NeuroID    string           `json:"neuro_id"`
+	Pillar     string           `json:"pillar"`
+	TotalScore float64          `json:"total_score"`
+	Zone       string           `json:"zone"`
+	Items      []ItemSubmission `json:"items"`
 }
 
-// ItemSubmission represents a single item answer in the submission
 type ItemSubmission struct {
 	ItemCode string `json:"item_code"`
 	RawScore int    `json:"raw_score"`
 }
 
-// AssessmentResult is the response for assessment results
 type AssessmentResult struct {
 	ChildID       string        `json:"child_id"`
 	PillarScores  []PillarScore `json:"pillar_scores"`
@@ -143,55 +152,14 @@ type AssessmentResult struct {
 	Items         []ItemResponse `json:"items,omitempty"`
 }
 
-// APIResponse is a generic API response wrapper
 type APIResponse struct {
 	Success bool        `json:"success"`
 	Data    interface{} `json:"data,omitempty"`
 	Error   string      `json:"error,omitempty"`
 }
 
-// TokenValidationRequest is the request to validate an access token
-type TokenValidationRequest struct {
-	Token string `json:"token"`
-}
-
-// TokenValidationResponse is the response from token validation
-type TokenValidationResponse struct {
-	Valid     bool   `json:"valid"`
-	Role      string `json:"role,omitempty"`
-	ChildID   string `json:"child_id,omitempty"`
-	ExpiresAt string `json:"expires_at,omitempty"`
-}
-
-// RegisterChildFullRequest is the request body for registering a child with 3 informants
-type RegisterChildFullRequest struct {
-	SchoolID  string `json:"school_id"`
-	Grade     int    `json:"grade"`
-	BirthYear int    `json:"birth_year"`
-}
-
-// ChildWithTokens represents a child and their 3 magic links
-type ChildWithTokens struct {
-	Child        Child  `json:"child"`
-	ParentToken  string `json:"parent_token"`
-	TeacherToken string `json:"teacher_token"`
-	StudentToken string `json:"student_token"`
-}
-
-// SchoolDashboardResponse represents the dashboard data
-type SchoolDashboardResponse struct {
-	School      School               `json:"school"`
-	TotalHijau  int                  `json:"total_hijau"`
-	TotalKuning int                  `json:"total_kuning"`
-	TotalMerah  int                  `json:"total_merah"`
-	TotalReview int                  `json:"total_review"`
-	Children    []ChildDashboardItem `json:"children"`
-}
-
 type ChildDashboardItem struct {
-	Child        Child           `json:"child"`
-	Composite    *CompositeScore `json:"composite,omitempty"`
-	ParentToken  string          `json:"parent_token,omitempty"`
-	TeacherToken string          `json:"teacher_token,omitempty"`
-	StudentToken string          `json:"student_token,omitempty"`
+	Child     Child           `json:"child"`
+	Status    string          `json:"status"` // "pending", "parent_done", "complete"
+	Composite *CompositeScore `json:"composite,omitempty"`
 }

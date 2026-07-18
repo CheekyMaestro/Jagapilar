@@ -1,5 +1,5 @@
 // ============================================================
-// JAGAPILAR — Assessment Page Logic
+// JAGAPILAR — Assessment Page Logic (Neuro ID Flow)
 // Questionnaire items (18 items from PRD), Likert selection,
 // progressive save, client-side scoring, API integration
 // ============================================================
@@ -22,6 +22,7 @@ const ASSESSMENT_ITEMS = {
         { code: 'G5', text: 'Anak ini menarik diri dari interaksi sosial dengan teman sebaya saat jam istirahat.', isReverse: false, construct: 'Isolasi sosial' },
         { code: 'G6', text: 'Prestasi/performa akademik anak ini menurun dibanding awal semester tanpa sebab akademik yang jelas.', isReverse: false, construct: 'Penurunan performa akademik' },
     ],
+    // student role here is fallback, though they use assessment-kids.html
     student: [
         { code: 'M1', text: 'Aku jadi gelisah atau nggak enak rasanya, kalau lama nggak pegang HP/gadget.', isReverse: false, construct: 'Craving / withdrawal subjektif' },
         { code: 'M2', text: 'Awalnya aku cuma mau main sebentar, tapi ujung-ujungnya main gadget lama banget.', isReverse: false, construct: 'Loss of control' },
@@ -42,61 +43,29 @@ const LIKERT_LABELS = ['Tidak Pernah', 'Jarang', 'Kadang-kadang', 'Sering', 'Sel
 
 // --- State ---
 let currentRole = null;
+let currentNeuroId = null;
 let currentQuestionIndex = 0;
 let answers = {}; // { 'O1': 3, 'O2': 5, ... }
 
-let currentToken = null;
-let currentSessionId = null;
-
 // --- Initialization ---
-document.addEventListener('DOMContentLoaded', async () => {
-    // Check URL params for pre-selected role
+document.addEventListener('DOMContentLoaded', () => {
+    // Check URL params for role and neuro_id
     const params = new URLSearchParams(window.location.search);
-    const token = params.get('token');
+    const role = params.get('role');
+    const neuroId = params.get('neuro_id');
     
-    if (token) {
-        currentToken = token;
-        try {
-            // Validate Token
-            const res = await apiCall('/auth/validate-token', {
-                method: 'POST',
-                body: JSON.stringify({ token: token })
-            });
-            
-            if (res && res.valid) {
-                // If it's a student, redirect to the specialized kids UI
-                if (res.role === 'student') {
-                    window.location.href = `assessment-kids.html?token=${token}`;
-                    return;
-                }
-                
-                // Auto-select role
-                selectRole(res.role);
-                
-                // Hide the intro selection manually
-                document.getElementById('role-selection').classList.add('hidden');
-                document.getElementById('assessment-form').classList.remove('hidden');
-                
-                // Create session
-                const sessionRes = await fetch(`${API_BASE}/assessment/sessions`, {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-                if(sessionRes.ok) {
-                    const session = await sessionRes.json();
-                    currentSessionId = session.id;
-                }
-            } else {
-                showToast('Link asesmen tidak valid atau kedaluwarsa.', 'error');
-            }
-        } catch(e) {
-            showToast('Gagal memvalidasi link asesmen.', 'error');
+    if (role && ASSESSMENT_ITEMS[role]) {
+        if (role === 'student') {
+            window.location.href = `assessment-kids.html?neuro_id=${neuroId || ''}`;
+            return;
         }
-    } else {
-        const role = params.get('role');
-        if (role && ASSESSMENT_ITEMS[role]) {
-            selectRole(role);
-        }
+
+        currentNeuroId = neuroId; // Can be null if they somehow got here without one
+        selectRole(role);
+        
+        // Hide the intro selection manually
+        document.getElementById('role-selection').classList.add('hidden');
+        document.getElementById('assessment-form').classList.remove('hidden');
     }
 });
 
@@ -104,6 +73,11 @@ document.addEventListener('DOMContentLoaded', async () => {
  * Select a role and show the assessment form
  */
 function selectRole(role) {
+    if (role === 'student') {
+        window.location.href = 'assessment-kids.html';
+        return;
+    }
+    
     currentRole = role;
     currentQuestionIndex = 0;
     answers = {};
@@ -206,21 +180,8 @@ function selectAnswer(value) {
     const item = items[currentQuestionIndex];
     answers[item.code] = value;
 
-    // Progressive save if session exists
-    if (currentSessionId && currentToken) {
-        fetch(`${API_BASE}/assessment/responses`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${currentToken}`
-            },
-            body: JSON.stringify({
-                session_id: currentSessionId,
-                item_code: item.code,
-                raw_score: value
-            })
-        }).catch(e => console.log('Progressive save fail:', e));
-    }
+    // Simulate progressive save
+    console.log(`Saved item ${item.code} with value ${value} for Neuro ID ${currentNeuroId}`);
 
     // Update button styles
     renderQuestion();
@@ -264,7 +225,7 @@ function prevQuestion() {
 }
 
 /**
- * Calculate score and show results (client-side for now, will integrate with API)
+ * Calculate score and show results
  */
 function submitAssessment() {
     const items = ASSESSMENT_ITEMS[currentRole];
@@ -371,39 +332,7 @@ function submitAssessment() {
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
-    // Try to send to API (non-blocking)
-    sendToAPI(totalScore, zone, itemScores).catch(() => {});
-}
-
-/**
- * Send assessment results to backend API
- */
-async function sendToAPI(totalScore, zone, itemScores) {
-    try {
-        const headers = {
-            'Content-Type': 'application/json'
-        };
-        if (currentToken) {
-            headers['Authorization'] = `Bearer ${currentToken}`;
-        }
-        
-        await fetch(`${API_BASE}/assessment/submit`, {
-            method: 'POST',
-            headers: headers,
-            body: JSON.stringify({
-                pillar: currentRole,
-                total_score: totalScore,
-                zone: zone,
-                items: itemScores.map(s => ({
-                    item_code: s.code,
-                    raw_score: s.rawScore,
-                }))
-            })
-        });
-    } catch (e) {
-        // Silent fail — results are shown client-side regardless
-        console.log('API submission failed (non-critical):', e);
-    }
+    console.log(`Submitted for ${currentNeuroId}`, itemScores);
 }
 
 /**
@@ -413,6 +342,12 @@ function resetAssessment() {
     currentQuestionIndex = 0;
     answers = {};
     document.getElementById('results-section').classList.add('hidden');
-    document.getElementById('role-selection').classList.remove('hidden');
+    
+    if (currentNeuroId) {
+        document.getElementById('assessment-form').classList.remove('hidden');
+        renderQuestion();
+    } else {
+        document.getElementById('role-selection').classList.remove('hidden');
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }

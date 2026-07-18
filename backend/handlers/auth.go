@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -9,56 +10,127 @@ import (
 
 	"jagapilar-backend/database"
 	"jagapilar-backend/models"
+
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// ValidateToken handles POST /api/auth/validate-token
-func ValidateToken(w http.ResponseWriter, r *http.Request) {
+var jwtKey = []byte("JAGAPILAR_SECRET_KEY_CHANGE_ME_IN_PROD")
+
+type Claims struct {
+	UserID string `json:"user_id"`
+	Role   string `json:"role"`
+	jwt.RegisteredClaims
+}
+
+// RegisterUser handles POST /api/auth/register
+func RegisterUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		respondError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
-	var req models.TokenValidationRequest
+	var req models.RegisterUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		respondError(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
-	if req.Token == "" {
-		respondJSON(w, http.StatusOK, models.TokenValidationResponse{Valid: false})
+	if req.Role != "parent" && req.Role != "teacher" {
+		respondError(w, http.StatusBadRequest, "Role harus parent atau teacher")
 		return
 	}
 
-	var informant models.Informant
-	err := database.DB.QueryRow(
-		`SELECT id, child_id, role, access_token, token_expires_at
-		 FROM informants WHERE access_token = $1`,
-		req.Token,
-	).Scan(&informant.ID, &informant.ChildID, &informant.Role, &informant.AccessToken, &informant.TokenExpiresAt)
+	// Hash password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "Gagal memproses password")
+		return
+	}
+
+	var user models.User
+	err = database.DB.QueryRow(
+		`INSERT INTO users (name, email_contact, password_hash, role)
+		 VALUES ($1, $2, $3, $4)
+		 RETURNING id, name, email_contact, role, created_at`,
+		req.Name, req.EmailContact, string(hashedPassword), req.Role,
+	).Scan(&user.ID, &user.Name, &user.EmailContact, &user.Role, &user.CreatedAt)
 
 	if err != nil {
-		respondJSON(w, http.StatusOK, models.TokenValidationResponse{Valid: false})
+		if strings.Contains(err.Error(), "unique constraint") {
+			respondError(w, http.StatusConflict, "Email/Kontak sudah terdaftar")
+			return
+		}
+		log.Printf("Register error: %v", err)
+		respondError(w, http.StatusInternalServerError, "Gagal mendaftarkan akun")
 		return
 	}
 
-	// Check expiration
-	if informant.TokenExpiresAt != nil && informant.TokenExpiresAt.Before(time.Now()) {
-		respondJSON(w, http.StatusOK, models.TokenValidationResponse{Valid: false})
+	respondJSON(w, http.StatusCreated, user)
+}
+
+// LoginUser handles POST /api/auth/login
+func LoginUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		respondError(w, http.StatusMethodNotAllowed, "Method not allowed")
 		return
 	}
 
-	expiresStr := ""
-	if informant.TokenExpiresAt != nil {
-		expiresStr = informant.TokenExpiresAt.Format(time.RFC3339)
+	var req models.LoginRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		respondError(w, http.StatusBadRequest, "Invalid request body")
+		return
 	}
 
-	logAudit(informant.Role, "token_validated", "informants", informant.ID)
+	var user models.User
+	var passwordHash string
+	var schoolID sql.NullString
 
-	respondJSON(w, http.StatusOK, models.TokenValidationResponse{
-		Valid:     true,
-		Role:      informant.Role,
-		ChildID:   informant.ChildID,
-		ExpiresAt: expiresStr,
+	err := database.DB.QueryRow(
+		`SELECT id, name, email_contact, password_hash, role, school_id, created_at
+		 FROM users WHERE email_contact = $1`,
+		req.EmailContact,
+	).Scan(&user.ID, &user.Name, &user.EmailContact, &passwordHash, &user.Role, &schoolID, &user.CreatedAt)
+
+	if err == sql.ErrNoRows {
+		respondError(w, http.StatusUnauthorized, "Email atau Password salah")
+		return
+	} else if err != nil {
+		log.Printf("Login error: %v", err)
+		respondError(w, http.StatusInternalServerError, "Terjadi kesalahan sistem")
+		return
+	}
+
+	if schoolID.Valid {
+		user.SchoolID = &schoolID.String
+	}
+
+	// Verify password
+	if err := bcrypt.CompareHashAndPassword([]byte(passwordHash), []byte(req.Password)); err != nil {
+		respondError(w, http.StatusUnauthorized, "Email atau Password salah")
+		return
+	}
+
+	// Create JWT token
+	expirationTime := time.Now().Add(24 * time.Hour)
+	claims := &Claims{
+		UserID: user.ID,
+		Role:   user.Role,
+		RegisteredClaims: jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(expirationTime),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString(jwtKey)
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, "Gagal membuat sesi")
+		return
+	}
+
+	respondJSON(w, http.StatusOK, models.AuthResponse{
+		Token: tokenString,
+		User:  user,
 	})
 }
 
@@ -67,8 +139,10 @@ func AuthHandler(w http.ResponseWriter, r *http.Request) {
 	path := r.URL.Path
 
 	switch {
-	case path == "/api/auth/validate-token":
-		ValidateToken(w, r)
+	case path == "/api/auth/register":
+		RegisterUser(w, r)
+	case path == "/api/auth/login":
+		LoginUser(w, r)
 	default:
 		respondError(w, http.StatusNotFound, "Endpoint not found")
 	}
@@ -95,7 +169,6 @@ func respondError(w http.ResponseWriter, status int, message string) {
 func extractPathParam(path, prefix string) string {
 	param := strings.TrimPrefix(path, prefix)
 	param = strings.TrimSuffix(param, "/")
-	// Remove sub-paths
 	if idx := strings.Index(param, "/"); idx != -1 {
 		param = param[:idx]
 	}

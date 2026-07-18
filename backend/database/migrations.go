@@ -5,16 +5,15 @@ import (
 )
 
 // RunMigrations creates all required tables if they don't exist
-// Schema follows the PRD: schools, children, informants, assessment_items,
+// Schema follows the PRD: users, children, teacher_children, assessment_items,
 // assessment_sessions, item_responses, pillar_scores, composite_scores,
-// referrals, audit_log, literature_repository
 func RunMigrations() error {
 	migrations := []string{
-		// Schools table
+		// Schools table (Kept for compatibility or if teachers want to select it)
 		`CREATE TABLE IF NOT EXISTS schools (
 			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			name TEXT NOT NULL,
-			city TEXT NOT NULL,
+			city TEXT,
 			grade_level TEXT,
 			principal_name TEXT,
 			total_classes INT DEFAULT 0,
@@ -22,26 +21,34 @@ func RunMigrations() error {
 			created_at TIMESTAMPTZ DEFAULT now()
 		)`,
 
-		// Children table (anonymized)
-		`CREATE TABLE IF NOT EXISTS children (
+		// Users table (Parents & Teachers)
+		`CREATE TABLE IF NOT EXISTS users (
 			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			anon_code TEXT UNIQUE NOT NULL,
-			school_id UUID REFERENCES schools(id) ON DELETE CASCADE,
-			grade SMALLINT,
-			birth_year SMALLINT,
+			name TEXT NOT NULL,
+			email_contact TEXT UNIQUE NOT NULL,
+			password_hash TEXT NOT NULL,
+			role TEXT NOT NULL CHECK (role IN ('parent', 'teacher')),
+			school_id UUID REFERENCES schools(id) ON DELETE SET NULL,
 			created_at TIMESTAMPTZ DEFAULT now()
 		)`,
 
-		// Informants table (parent/teacher/student linked to a child)
-		`CREATE TABLE IF NOT EXISTS informants (
+		// Children table (with Neuro ID)
+		`CREATE TABLE IF NOT EXISTS children (
 			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			child_id UUID REFERENCES children(id) ON DELETE CASCADE,
-			role TEXT NOT NULL CHECK (role IN ('parent', 'teacher', 'student')),
-			contact_hash TEXT,
-			access_token TEXT UNIQUE,
-			token_expires_at TIMESTAMPTZ,
-			consent_signed_at TIMESTAMPTZ,
+			neuro_id TEXT UNIQUE NOT NULL,
+			name TEXT NOT NULL,
+			birth_year SMALLINT,
+			gender TEXT,
+			created_by UUID REFERENCES users(id) ON DELETE CASCADE,
 			created_at TIMESTAMPTZ DEFAULT now()
+		)`,
+
+		// Teacher-Child Mapping (Dashboard Guru)
+		`CREATE TABLE IF NOT EXISTS teacher_children (
+			teacher_id UUID REFERENCES users(id) ON DELETE CASCADE,
+			child_id UUID REFERENCES children(id) ON DELETE CASCADE,
+			added_at TIMESTAMPTZ DEFAULT now(),
+			PRIMARY KEY (teacher_id, child_id)
 		)`,
 
 		// Assessment items master table (18 items, seeded once)
@@ -58,7 +65,7 @@ func RunMigrations() error {
 		`CREATE TABLE IF NOT EXISTS assessment_sessions (
 			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 			child_id UUID REFERENCES children(id) ON DELETE CASCADE,
-			informant_id UUID REFERENCES informants(id),
+			user_id UUID REFERENCES users(id) ON DELETE SET NULL,
 			pillar TEXT NOT NULL,
 			submitted_at TIMESTAMPTZ,
 			status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'submitted')),
@@ -94,16 +101,6 @@ func RunMigrations() error {
 			calculated_at TIMESTAMPTZ DEFAULT now()
 		)`,
 
-		// Referrals for high-risk cases
-		`CREATE TABLE IF NOT EXISTS referrals (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			child_id UUID REFERENCES children(id) ON DELETE CASCADE,
-			referred_at TIMESTAMPTZ DEFAULT now(),
-			referred_to TEXT,
-			handbook_sent BOOLEAN DEFAULT false,
-			notes JSONB
-		)`,
-
 		// Audit log for data access tracking
 		`CREATE TABLE IF NOT EXISTS audit_log (
 			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -114,19 +111,10 @@ func RunMigrations() error {
 			occurred_at TIMESTAMPTZ DEFAULT now()
 		)`,
 
-		// Literature repository (JSONB instead of separate NoSQL)
-		`CREATE TABLE IF NOT EXISTS literature_repository (
-			id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-			category TEXT,
-			citation_harvard TEXT,
-			metadata JSONB,
-			created_at TIMESTAMPTZ DEFAULT now()
-		)`,
-
 		// Indexes for common queries
-		`CREATE INDEX IF NOT EXISTS idx_children_school ON children(school_id)`,
-		`CREATE INDEX IF NOT EXISTS idx_informants_child ON informants(child_id)`,
-		`CREATE INDEX IF NOT EXISTS idx_informants_token ON informants(access_token)`,
+		`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email_contact)`,
+		`CREATE INDEX IF NOT EXISTS idx_children_neuro_id ON children(neuro_id)`,
+		`CREATE INDEX IF NOT EXISTS idx_children_created_by ON children(created_by)`,
 		`CREATE INDEX IF NOT EXISTS idx_sessions_child ON assessment_sessions(child_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_responses_session ON item_responses(session_id)`,
 		`CREATE INDEX IF NOT EXISTS idx_audit_occurred ON audit_log(occurred_at)`,

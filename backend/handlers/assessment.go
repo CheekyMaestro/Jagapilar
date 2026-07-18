@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"jagapilar-backend/database"
+	"jagapilar-backend/middleware"
 	"jagapilar-backend/models"
 	"jagapilar-backend/services"
 )
@@ -55,12 +56,15 @@ func GetAssessmentItems(w http.ResponseWriter, r *http.Request) {
 
 // CreateSession handles POST /api/assessment/sessions
 func CreateSession(w http.ResponseWriter, r *http.Request) {
-	childID := r.Header.Get("X-Child-ID")
-	informantID := r.Header.Get("X-Informant-ID")
-	pillar := r.Header.Get("X-User-Role")
+	neuroID := r.Header.Get("X-Neuro-ID")
+	pillar := r.Header.Get("X-User-Role") // Should match the intended pillar
+	
+	// Get auth context if present
+	userID, okUser := r.Context().Value(middleware.UserIDKey).(string)
+	userRole, _ := r.Context().Value(middleware.RoleKey).(string)
 
-	if childID == "" || informantID == "" {
-		respondError(w, http.StatusUnauthorized, "Sesi tidak valid, gunakan link akses yang benar")
+	if neuroID == "" {
+		respondError(w, http.StatusBadRequest, "Neuro ID diperlukan")
 		return
 	}
 
@@ -70,13 +74,40 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// ENFORCEMENT: Parent can only start parent session, Teacher -> teacher
+	if pillar != "student" {
+		if !okUser {
+			respondError(w, http.StatusUnauthorized, "Sesi kadaluarsa, silakan login ulang")
+			return
+		}
+		if userRole != pillar {
+			respondError(w, http.StatusForbidden, "Akses ditolak: Peran Anda tidak sesuai dengan asesmen ini")
+			return
+		}
+	}
+
+	// Resolve child_id from neuro_id
+	var childID string
+	err := database.DB.QueryRow("SELECT id FROM children WHERE neuro_id = $1", neuroID).Scan(&childID)
+	if err != nil {
+		respondError(w, http.StatusNotFound, "Neuro ID tidak valid")
+		return
+	}
+
 	var session models.AssessmentSession
-	err := database.DB.QueryRow(
-		`INSERT INTO assessment_sessions (child_id, informant_id, pillar, status)
+	
+	// Insert session
+	var userIDPtr *string
+	if okUser {
+		userIDPtr = &userID
+	}
+	
+	err = database.DB.QueryRow(
+		`INSERT INTO assessment_sessions (child_id, user_id, pillar, status)
 		 VALUES ($1, $2, $3, 'draft')
-		 RETURNING id, child_id, informant_id, pillar, status, created_at`,
-		childID, informantID, pillar,
-	).Scan(&session.ID, &session.ChildID, &session.InformantID, &session.Pillar, &session.Status, &session.CreatedAt)
+		 RETURNING id, child_id, user_id, pillar, status, created_at`,
+		childID, userIDPtr, pillar,
+	).Scan(&session.ID, &session.ChildID, &session.UserID, &session.Pillar, &session.Status, &session.CreatedAt)
 
 	if err != nil {
 		log.Printf("Error creating session: %v", err)
@@ -84,7 +115,6 @@ func CreateSession(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("📋 Assessment session created: %s (pillar=%s)", session.ID, session.Pillar)
 	respondJSON(w, http.StatusCreated, session)
 }
 
@@ -101,15 +131,15 @@ func SaveResponse(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Upsert response (replace if already answered)
+	// Upsert response
 	_, err := database.DB.Exec(
 		`INSERT INTO item_responses (session_id, item_code, raw_score)
 		 VALUES ($1, $2, $3)
 		 ON CONFLICT (session_id, item_code) DO UPDATE SET raw_score = $3, saved_at = now()`,
 		req.SessionID, req.ItemCode, req.RawScore,
 	)
-	// If unique constraint doesn't exist for session_id + item_code, use simple insert
 	if err != nil {
+		// Fallback if unique constraint doesn't exist
 		_, err = database.DB.Exec(
 			`INSERT INTO item_responses (session_id, item_code, raw_score)
 			 VALUES ($1, $2, $3)`,
@@ -126,7 +156,6 @@ func SaveResponse(w http.ResponseWriter, r *http.Request) {
 }
 
 // SubmitAssessment handles POST /api/assessment/submit
-// This finalizes a session and triggers scoring
 func SubmitAssessment(w http.ResponseWriter, r *http.Request) {
 	var req models.SubmitAssessmentRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
@@ -134,17 +163,30 @@ func SubmitAssessment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Override with header values from token if present
-	if hChildID := r.Header.Get("X-Child-ID"); hChildID != "" {
-		req.ChildID = hChildID
-	}
-	if hPillar := r.Header.Get("X-User-Role"); hPillar != "" {
-		req.Pillar = hPillar
+	// JWT Role validation
+	_, okUser := r.Context().Value(middleware.UserIDKey).(string)
+	userRole, _ := r.Context().Value(middleware.RoleKey).(string)
+
+	if req.Pillar != "student" {
+		if !okUser {
+			respondError(w, http.StatusUnauthorized, "Sesi kadaluarsa, silakan login ulang")
+			return
+		}
+		if userRole != req.Pillar {
+			respondError(w, http.StatusForbidden, "Akses ditolak: Anda tidak diizinkan submit asesmen pilar ini")
+			return
+		}
 	}
 
-	// If child_id is provided, save the scores server-side
-	if req.ChildID != "" && len(req.Items) > 0 {
-		// Convert items to ItemResponse format
+	// Resolve child_id from neuro_id
+	var childID string
+	err := database.DB.QueryRow("SELECT id FROM children WHERE neuro_id = $1", req.NeuroID).Scan(&childID)
+	if err != nil {
+		respondError(w, http.StatusNotFound, "Neuro ID tidak valid")
+		return
+	}
+
+	if len(req.Items) > 0 {
 		var responses []models.ItemResponse
 		for _, item := range req.Items {
 			responses = append(responses, models.ItemResponse{
@@ -153,8 +195,8 @@ func SubmitAssessment(w http.ResponseWriter, r *http.Request) {
 			})
 		}
 
-		// Calculate and save pillar score
-		pillarScore, err := services.CalculateAndSavePillarScore(req.ChildID, req.Pillar, responses)
+		// Save pillar score
+		pillarScore, err := services.CalculateAndSavePillarScore(childID, req.Pillar, responses)
 		if err != nil {
 			log.Printf("Error calculating pillar score: %v", err)
 			respondError(w, http.StatusInternalServerError, "Gagal menghitung skor")
@@ -163,14 +205,11 @@ func SubmitAssessment(w http.ResponseWriter, r *http.Request) {
 
 		// Check if all 3 pillars have been submitted
 		var pillarCount int
-		database.DB.QueryRow(
-			"SELECT COUNT(*) FROM pillar_scores WHERE child_id = $1",
-			req.ChildID,
-		).Scan(&pillarCount)
+		database.DB.QueryRow("SELECT COUNT(*) FROM pillar_scores WHERE child_id = $1", childID).Scan(&pillarCount)
 
 		var compositeResult *models.CompositeScore
 		if pillarCount >= 3 {
-			compositeResult, err = services.OnAllThreePillarsSubmitted(req.ChildID)
+			compositeResult, err = services.OnAllThreePillarsSubmitted(childID)
 			if err != nil {
 				log.Printf("Error calculating composite: %v", err)
 			}
@@ -189,7 +228,6 @@ func SubmitAssessment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Simple acknowledgment if no child_id (client-side scoring mode)
 	respondJSON(w, http.StatusOK, map[string]interface{}{
 		"status":      "received",
 		"pillar":      req.Pillar,
@@ -198,11 +236,18 @@ func SubmitAssessment(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// GetResults handles GET /api/assessment/results/{child_id}
+// GetResults handles GET /api/assessment/results/{neuro_id}
 func GetResults(w http.ResponseWriter, r *http.Request) {
-	childID := extractPathParam(r.URL.Path, "/api/assessment/results/")
-	if childID == "" {
-		respondError(w, http.StatusBadRequest, "Child ID required")
+	neuroID := extractPathParam(r.URL.Path, "/api/assessment/results/")
+	if neuroID == "" {
+		respondError(w, http.StatusBadRequest, "Neuro ID diperlukan")
+		return
+	}
+
+	var childID string
+	err := database.DB.QueryRow("SELECT id FROM children WHERE neuro_id = $1", neuroID).Scan(&childID)
+	if err != nil {
+		respondError(w, http.StatusNotFound, "Neuro ID tidak ditemukan")
 		return
 	}
 
