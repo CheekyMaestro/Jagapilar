@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asesmen 360° | JAGAPILAR</title>
+    <meta name="description"
+        content="Kuesioner asesmen 360° untuk deteksi dini brain-rotting. 6 pertanyaan kunci per pilar informan.">
+
+    <!-- Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@700;800&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet">
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="js/tailwind-config.js"></script>
+
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+    <!-- TopNavBar -->
+    <header class="bg-surface border-b border-outline-variant h-[90px] w-full sticky top-0 z-50">
+        <div class="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto h-full">
+            <a href="index.html" class="flex items-center gap-4">
+                <img alt="JAGAPILAR Logo" class="h-12 w-auto"
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCldyVhV-xrdWAEMnqEK1FEKCt2MExe9gZTkC9ZcIZG_kYV44h_CFOO3EoKq4C5WO2e56HM4VDdvcw4Iw72VT11LIh54lOb-sj5RhuKb-GIDSGQW4w5wewtkAK9fZNJU2iKMF-tQ3pi176StBK1m4FZW_pAoAbOOHbPgCGzlA6PYTk9wNteKYR8V1eDstrx7x6CYeiDmo_x5PKwH8xQxDWTyTQpfDqejMfmcsbqdSOqk2ihJH1_7IC7-LJIJTbfuYA6fik-0j1RgYIG">
+                <span class="font-headline-md text-headline-md font-extrabold text-primary">JAGAPILAR</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="font-nav-link text-nav-link text-nav-blue hover:text-primary transition-colors"
+                    href="index.html">Beranda</a>
+                <a class="font-nav-link text-nav-link text-nav-blue hover:text-primary transition-colors font-bold border-b-2 border-primary pb-1"
+                    href="assessment.html">Asesmen</a>
+                <a class="font-nav-link text-nav-link text-nav-blue hover:text-primary transition-colors"
+                    href="register.html">Untuk Sekolah</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Assessment Content -->
+    <main class="min-h-screen">
+        <!-- Hero Banner -->
+        <div class="relative bg-gradient-to-br from-teal-deep to-primary py-16 overflow-hidden">
+            <div class="absolute inset-0 bg-dot-pattern opacity-10"></div>
+            <div class="max-w-container-max mx-auto px-margin-desktop relative z-10 text-center">
+                <h1 class="font-headline-lg text-headline-lg text-white mb-4">Asesmen Neuro-ID 360°</h1>
+                <p class="font-body-lg text-body-lg text-white/80 max-w-2xl mx-auto">
+                    Jawab 6 pertanyaan berikut dengan jujur. Setiap jawaban akan membantu mengidentifikasi risiko
+                    brain-rotting secara akurat.
+                </p>
+            </div>
+        </div>
+
+        <!-- Role Selection (shown when no role is selected) -->
+        <section id="role-selection" class="py-16 max-w-container-max mx-auto px-margin-desktop">
+            <h2 class="font-headline-md text-headline-md text-primary text-center mb-3">Pilih Peran Anda</h2>
+            <p class="font-body-md text-body-md text-on-surface-variant text-center mb-10">
+                Setiap peran memiliki 6 pertanyaan yang dirancang khusus untuk perspektif masing-masing.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+                <!-- Orang Tua -->
+                <button onclick="selectRole('parent')"
+                    class="bg-surface-container-lowest p-8 rounded-xxl shadow-lg border-2 border-transparent hover:border-primary flex flex-col items-center text-center group transition-all duration-300 hover:-translate-y-1">
+                    <div
+                        class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl"
+                            style="font-variation-settings: 'FILL' 1;">family_restroom</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-primary mb-2">Orang Tua</h3>
+                    <p class="text-sm text-on-surface-variant">Evaluasi perilaku anak di rumah terkait penggunaan
+                        gadget.</p>
+                    <div
+                        class="mt-4 px-4 py-1 rounded-full bg-primary/10 text-primary text-label-caps font-label-caps">
+                        6 PERTANYAAN</div>
+                </button>
+                <!-- Guru -->
+                <button onclick="selectRole('teacher')"
+                    class="bg-surface-container-lowest p-8 rounded-xxl shadow-lg border-2 border-transparent hover:border-primary flex flex-col items-center text-center group transition-all duration-300 hover:-translate-y-1">
+                    <div
+                        class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl"
+                            style="font-variation-settings: 'FILL' 1;">school</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-primary mb-2">Guru</h3>
+                    <p class="text-sm text-on-surface-variant">Observasi fokus dan interaksi sosial siswa di sekolah.
+                    </p>
+                    <div
+                        class="mt-4 px-4 py-1 rounded-full bg-primary/10 text-primary text-label-caps font-label-caps">
+                        6 PERTANYAAN</div>
+                </button>
+                <!-- Anak -->
+                <button onclick="selectRole('student')"
+                    class="bg-surface-container-lowest p-8 rounded-xxl shadow-lg border-2 border-transparent hover:border-primary flex flex-col items-center text-center group transition-all duration-300 hover:-translate-y-1">
+                    <div
+                        class="w-16 h-16 rounded-full bg-primary flex items-center justify-center text-white mb-4 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl"
+                            style="font-variation-settings: 'FILL' 1;">child_care</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-primary mb-2">Anak / Murid</h3>
+                    <p class="text-sm text-on-surface-variant">Self-assessment tentang kebiasaan digital kamu.</p>
+                    <div
+                        class="mt-4 px-4 py-1 rounded-full bg-primary/10 text-primary text-label-caps font-label-caps">
+                        6 PERTANYAAN</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Assessment Form (hidden initially, shown after role selection) -->
+        <section id="assessment-form" class="hidden py-12 max-w-3xl mx-auto px-margin-mobile">
+            <!-- Role Badge -->
+            <div class="flex items-center justify-between mb-8">
+                <div class="flex items-center gap-3">
+                    <span id="role-icon"
+                        class="material-symbols-outlined text-2xl text-primary"
+                        style="font-variation-settings: 'FILL' 1;">family_restroom</span>
+                    <div>
+                        <div class="text-label-caps font-label-caps text-on-surface-variant">PILAR</div>
+                        <div id="role-label" class="font-headline-md text-headline-md text-primary">Orang Tua</div>
+                    </div>
+                </div>
+                <button onclick="resetRole()"
+                    class="text-sm text-nav-blue hover:text-primary flex items-center gap-1 transition-colors">
+                    <span class="material-symbols-outlined text-sm">swap_horiz</span>
+                    Ganti Peran
+                </button>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mb-10">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-on-surface-variant">Pertanyaan <span id="current-q">1</span> dari
+                        6</span>
+                    <span id="progress-pct" class="text-sm font-bold text-primary">17%</span>
+                </div>
+                <div class="h-2 bg-surface-container-high rounded-full overflow-hidden">
+                    <div id="progress-bar" class="h-full bg-teal-deep rounded-full progress-bar" style="width: 17%">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Question Container -->
+            <div id="question-container"
+                class="bg-surface-container-lowest rounded-xxl shadow-xl p-8 md:p-12 border border-outline-variant/30">
+                <!-- Question text -->
+                <div class="mb-8">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span id="q-code"
+                            class="px-3 py-1 rounded-full bg-primary text-white text-label-caps font-label-caps">O1</span>
+                        <span id="q-construct"
+                            class="px-3 py-1 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-medium">Dopamine
+                            withdrawal</span>
+                    </div>
+                    <h3 id="q-text" class="font-headline-md text-headline-md text-on-surface leading-relaxed">
+                        Anak saya tantrum/marah berlebihan saat gadget diambil atau dibatasi waktunya.
+                    </h3>
+                </div>
+
+                <!-- Likert Scale (1-5) -->
+                <div class="space-y-3" id="likert-options">
+                    <button onclick="selectAnswer(1)" data-value="1"
+                        class="likert-option w-full flex items-center gap-4 p-4 rounded-xl border-2 border-outline-variant/50 bg-surface-container-low hover:border-primary">
+                        <div
+                            class="w-10 h-10 rounded-full border-2 border-outline-variant flex items-center justify-center font-bold text-on-surface-variant shrink-0">
+                            1</div>
+                        <span class="font-body-md text-on-surface text-left">Tidak Pernah</span>
+                    </button>
+                    <button onclick="selectAnswer(2)" data-value="2"
+                        class="likert-option w-full flex items-center gap-4 p-4 rounded-xl border-2 border-outline-variant/50 bg-surface-container-low hover:border-primary">
+                        <div
+                            class="w-10 h-10 rounded-full border-2 border-outline-variant flex items-center justify-center font-bold text-on-surface-variant shrink-0">
+                            2</div>
+                        <span class="font-body-md text-on-surface text-left">Jarang</span>
+                    </button>
+                    <button onclick="selectAnswer(3)" data-value="3"
+                        class="likert-option w-full flex items-center gap-4 p-4 rounded-xl border-2 border-outline-variant/50 bg-surface-container-low hover:border-primary">
+                        <div
+                            class="w-10 h-10 rounded-full border-2 border-outline-variant flex items-center justify-center font-bold text-on-surface-variant shrink-0">
+                            3</div>
+                        <span class="font-body-md text-on-surface text-left">Kadang-kadang</span>
+                    </button>
+                    <button onclick="selectAnswer(4)" data-value="4"
+                        class="likert-option w-full flex items-center gap-4 p-4 rounded-xl border-2 border-outline-variant/50 bg-surface-container-low hover:border-primary">
+                        <div
+                            class="w-10 h-10 rounded-full border-2 border-outline-variant flex items-center justify-center font-bold text-on-surface-variant shrink-0">
+                            4</div>
+                        <span class="font-body-md text-on-surface text-left">Sering</span>
+                    </button>
+                    <button onclick="selectAnswer(5)" data-value="5"
+                        class="likert-option w-full flex items-center gap-4 p-4 rounded-xl border-2 border-outline-variant/50 bg-surface-container-low hover:border-primary">
+                        <div
+                            class="w-10 h-10 rounded-full border-2 border-outline-variant flex items-center justify-center font-bold text-on-surface-variant shrink-0">
+                            5</div>
+                        <span class="font-body-md text-on-surface text-left">Selalu</span>
+                    </button>
+                </div>
+
+                <!-- Navigation -->
+                <div class="mt-10 flex justify-between items-center">
+                    <button id="btn-prev" onclick="prevQuestion()"
+                        class="text-primary font-label-caps text-label-caps hover:underline flex items-center gap-2 disabled:opacity-30"
+                        disabled>
+                        <span class="material-symbols-outlined">arrow_back</span>
+                        SEBELUMNYA
+                    </button>
+                    <button id="btn-next" onclick="nextQuestion()"
+                        class="jagapilar-btn flex items-center overflow-hidden transition-all group">
+                        <span id="btn-next-text"
+                            class="bg-primary text-white font-label-caps text-label-caps px-8 py-4 uppercase tracking-widest">BERIKUTNYA</span>
+                        <span
+                            class="btn-chip bg-white border border-primary border-l-0 text-primary w-12 h-12 flex items-center justify-center transition-transform duration-300">
+                            <span id="btn-next-icon" class="material-symbols-outlined"
+                                style="font-variation-settings: 'FILL' 1;">chevron_right</span>
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results Section (hidden initially, shown after submission) -->
+        <section id="results-section" class="hidden py-16 max-w-3xl mx-auto px-margin-mobile">
+            <div class="text-center mb-10">
+                <div class="w-20 h-20 rounded-full mx-auto mb-6 flex items-center justify-center" id="result-icon-bg">
+                    <span class="material-symbols-outlined text-4xl text-white"
+                        style="font-variation-settings: 'FILL' 1;">shield</span>
+                </div>
+                <h2 class="font-headline-lg text-headline-lg text-primary mb-2">Hasil Asesmen</h2>
+                <p id="result-role-label" class="text-on-surface-variant font-body-md">Pilar Orang Tua</p>
+            </div>
+
+            <!-- Score Card -->
+            <div
+                class="bg-surface-container-lowest rounded-xxl shadow-2xl p-8 md:p-12 border border-outline-variant/30 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <!-- Score Display -->
+                    <div class="text-center">
+                        <div class="text-6xl font-extrabold font-headline-lg mb-2" id="result-score">18</div>
+                        <div class="text-on-surface-variant font-body-md">dari rentang 6 - 30</div>
+                        <div class="mt-4">
+                            <span id="result-zone-badge"
+                                class="zone-badge inline-block px-6 py-2 rounded-full font-label-caps text-label-caps shadow-lg text-white bg-zone-green">
+                                ZONA HIJAU: AMAN
+                            </span>
+                        </div>
+                    </div>
+                    <!-- Zone Explanation -->
+                    <div id="result-explanation" class="space-y-4">
+                        <div class="p-4 rounded-xl bg-zone-green/10 border border-zone-green/20">
+                            <h4 class="font-bold text-zone-green mb-1">Apa Artinya?</h4>
+                            <p class="text-sm text-on-surface-variant">
+                                Aktivitas kognitif anak normal dan interaksi sosial sehat. Tetap lakukan pemantauan
+                                rutin.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Per-Item Breakdown -->
+                <div class="mt-10 pt-8 border-t border-surface-variant">
+                    <h4 class="font-headline-md text-headline-md text-primary mb-6">Rincian Jawaban</h4>
+                    <div id="result-items" class="space-y-3">
+                        <!-- Filled dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex flex-wrap justify-center gap-4">
+                <button onclick="resetAssessment()"
+                    class="bg-primary text-white font-label-caps text-label-caps py-4 px-8 hover:bg-primary-container transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined">refresh</span>
+                    ASESMEN ULANG
+                </button>
+                <a href="index.html"
+                    class="border-2 border-primary text-primary font-label-caps text-label-caps py-4 px-8 hover:bg-primary/5 transition-colors flex items-center gap-2">
+                    <span class="material-symbols-outlined">home</span>
+                    KEMBALI KE BERANDA
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-highest border-t border-outline-variant w-full py-8">
+        <div class="text-center px-margin-desktop max-w-container-max mx-auto">
+            <p class="font-body-md text-body-md text-on-surface-variant">
+                © 2024 JAGAPILAR. Instrumen ini bersifat riset akademis dan bukan pengganti diagnosis medis klinis
+                profesional.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/main.js"></script>
+    <script src="js/assessment.js"></script>
+</body>
+
+</html>

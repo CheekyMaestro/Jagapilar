@@ -1,0 +1,956 @@
+<!-- Registrasi Sekolah - JAGAPILAR -->
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>School Registration | JAGAPILAR</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&amp;family=Poppins:wght@700;800&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#a10075",
+                        "surface-bright": "#f9f9fd",
+                        "tertiary-fixed-dim": "#ffaed8",
+                        "on-surface-variant": "#41474e",
+                        "on-primary-fixed-variant": "#0f4b70",
+                        "surface-tint": "#306289",
+                        "surface-variant": "#e2e2e6",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#9bccf7",
+                        "primary": "#004064",
+                        "on-background": "#191c1e",
+                        "zone-yellow": "#F5C363",
+                        "on-primary-fixed": "#001d31",
+                        "surface-dim": "#d9dadd",
+                        "on-surface": "#191c1e",
+                        "outline": "#72787f",
+                        "primary-container": "#23587e",
+                        "tertiary": "#780056",
+                        "on-tertiary-fixed-variant": "#890063",
+                        "on-secondary-container": "#007169",
+                        "surface": "#f9f9fd",
+                        "error": "#ba1a1a",
+                        "zone-green": "#178754",
+                        "background": "#f9f9fd",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "inverse-surface": "#2e3133",
+                        "sky-blue": "#00A9E6",
+                        "teal-deep": "#10868B",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f0f0f4",
+                        "surface-container-low": "#f3f3f7",
+                        "on-tertiary-container": "#ffb2da",
+                        "secondary-fixed": "#59faec",
+                        "surface-container-highest": "#e2e2e6",
+                        "on-tertiary": "#ffffff",
+                        "nav-blue": "#479BCE",
+                        "zone-red": "#D93A3F",
+                        "primary-fixed": "#cce5ff",
+                        "on-secondary-fixed": "#00201d",
+                        "pink-bright": "#FF50C9",
+                        "surface-container-high": "#e7e8eb",
+                        "inverse-primary": "#9bccf7",
+                        "error-container": "#ffdad6",
+                        "secondary-container": "#59faec",
+                        "on-secondary-fixed-variant": "#00504a",
+                        "teal-light": "#32A8AD",
+                        "surface-container": "#edeef1",
+                        "outline-variant": "#c1c7cf",
+                        "secondary": "#006a63",
+                        "on-tertiary-fixed": "#3c0029",
+                        "secondary-fixed-dim": "#2eddcf",
+                        "tertiary-fixed": "#ffd8e9",
+                        "on-secondary": "#ffffff",
+                        "on-primary-container": "#9dcef9"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "2rem",
+                        "stack-sm": "0.5rem",
+                        "margin-mobile": "1.5rem",
+                        "container-max": "1280px",
+                        "stack-md": "1rem",
+                        "margin-desktop": "5rem",
+                        "gutter": "1rem"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "nav-link": ["Inter"],
+                        "headline-lg-mobile": ["Poppins"],
+                        "label-caps": ["Poppins"],
+                        "headline-md": ["Poppins"],
+                        "headline-lg": ["Poppins"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "nav-link": ["16px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "800" }],
+                        "label-caps": ["14px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        .step-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+
+        .hidden-step {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .active-step {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Button Hover Effect */
+        .jagapilar-btn:hover .btn-chip {
+            transform: translateX(4px);
+        }
+
+        .jagapilar-btn:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+
+<body class="bg-surface font-body-md text-on-surface">
+    <!-- TopNavBar -->
+    <header class="bg-surface border-b border-outline-variant h-[90px] w-full sticky top-0 z-50">
+        <div class="flex justify-between items-center px-margin-desktop max-w-container-max mx-auto h-full">
+            <div class="flex items-center gap-4">
+                <img alt="JAGAPILAR Logo" class="h-12 w-auto"
+                    src="https://lh3.googleusercontent.com/aida/AP1WRLsE1BBhiCgLhBmM_wbeMOXEfMM-Q6ey4SEuhimqolbiFhJfrxGHTnfN-PIg5DRp9rBtCCLtach9pRvVq6YarqIP1RG26f5J3QSlJRo6EKr7YJzFYnpapr6S15Rs2Wjv6KoyEhpCSNbWmO3tnEuhqj2uZg_1sUB6pgvC0n5hgXLSjwR6M93SahedXIcmNNj_2-1AJQdHaCMFeFr-ngQktKP51ipz_WL6cIgxaWjLXJlGf13Dpy3dlhFXaoKq" />
+                <span class="font-headline-md text-headline-md font-extrabold text-primary">JAGAPILAR</span>
+            </div>
+            <nav class="hidden md:flex items-center gap-8">
+                <a class="font-nav-link text-nav-link text-nav-blue hover:text-primary transition-colors"
+                    href="#">Home</a>
+                <a class="font-nav-link text-nav-link text-nav-blue hover:text-primary transition-colors"
+                    href="#">Research</a>
+                <a class="font-nav-link text-nav-link text-nav-blue hover:text-primary transition-colors"
+                    href="#">Resources</a>
+                <a class="font-nav-link text-nav-link text-nav-blue hover:text-primary transition-colors" href="#">About
+                    Us</a>
+            </nav>
+            <button
+                class="bg-primary-container text-on-primary-container px-6 py-2 font-label-caps text-label-caps rounded-sm hover:opacity-90 transition-all">
+                LOGIN
+            </button>
+        </div>
+    </header>
+    <!-- Main Content with Gradient Background -->
+    <main class="min-h-screen relative flex items-center justify-center py-stack-lg overflow-hidden">
+        <!-- Animated Background Element -->
+
+        <!-- Gradient Mesh Overlay -->
+        <div class="absolute inset-0 bg-gradient-to-br from-teal-deep to-teal-light opacity-90 -z-10"></div>
+        <!-- Subtle Pattern -->
+        <div class="absolute inset-0 opacity-10 -z-10"
+            style="background-image: radial-gradient(circle, #ffffff 1px, transparent 1px); background-size: 32px 32px;">
+        </div>
+        <div class="container max-w-2xl mx-auto px-margin-mobile relative z-10">
+            <!-- Header Text -->
+            <div class="text-center mb-stack-lg text-white">
+                <h1 class="font-headline-lg text-headline-lg mb-4">Daftarkan Sekolah Anda</h1>
+                <p class="font-body-lg text-body-lg opacity-90 max-w-lg mx-auto">
+                    Bergabunglah dengan ekosistem JAGAPILAR secara gratis. Data siswa akan dianonimisasi sepenuhnya
+                    untuk menjamin privasi.
+                </p>
+            </div>
+            <!-- Floating Form Card -->
+            <div class="bg-surface-container-lowest rounded-xl shadow-2xl p-8 md:p-12 border border-white/20">
+                <!-- Progress Indicator -->
+                <div class="flex items-center justify-center gap-4 mb-10">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors bg-primary text-white"
+                        id="dot-1">1</div>
+                    <div class="h-1 w-16 bg-outline-variant rounded-full overflow-hidden" id="line-progress">
+                        <div class="h-full w-0 bg-primary transition-all duration-300" id="line-fill"></div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors bg-surface-container-high text-on-surface-variant"
+                        id="dot-2">2</div>
+                </div>
+                <form id="registration-form" onsubmit="return false;">
+                    <!-- Step 1: Data Sekolah -->
+                    <div class="active-step step-transition" id="step-1">
+                        <h2 class="font-headline-md text-headline-md mb-6 text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined">school</span>
+                            Data Sekolah
+                        </h2>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">NAMA
+                                    SEKOLAH</label>
+                                <input
+                                    class="w-full border-outline-variant rounded-lg focus:ring-primary focus:border-primary px-4 py-3 bg-surface-container-low transition-all"
+                                    placeholder="Masukkan nama resmi sekolah" type="text" />
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block font-label-caps text-label-caps text-on-surface-variant mb-2">KOTA
+                                        / KABUPATEN</label>
+                                    <input
+                                        class="w-full border-outline-variant rounded-lg focus:ring-primary focus:border-primary px-4 py-3 bg-surface-container-low"
+                                        placeholder="Contoh: Jakarta Selatan" type="text" />
+                                </div>
+                                <div>
+                                    <label
+                                        class="block font-label-caps text-label-caps text-on-surface-variant mb-2">JENJANG
+                                        KELAS</label>
+                                    <select
+                                        class="w-full border-outline-variant rounded-lg focus:ring-primary focus:border-primary px-4 py-3 bg-surface-container-low">
+                                        <option disabled="" selected="">Pilih Jenjang</option>
+                                        <option>Kelas 3-6 SD</option>
+                                        <option>Kelas 1-3 SMP</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">KEPALA
+                                    SEKOLAH / PENANGGUNG JAWAB</label>
+                                <input
+                                    class="w-full border-outline-variant rounded-lg focus:ring-primary focus:border-primary px-4 py-3 bg-surface-container-low"
+                                    placeholder="Nama lengkap beserta gelar" type="text" />
+                            </div>
+                            <div>
+                                <label class="block font-label-caps text-label-caps text-on-surface-variant mb-2">JUMLAH
+                                    KELAS</label>
+                                <input
+                                    class="w-24 border-outline-variant rounded-lg focus:ring-primary focus:border-primary px-4 py-3 bg-surface-container-low"
+                                    min="1" placeholder="0" type="number" />
+                            </div>
+                        </div>
+                        <div class="mt-10 flex justify-end">
+                            <button class="jagapilar-btn flex items-center overflow-hidden transition-all group"
+                                onclick="goToStep(2)" type="button">
+                                <span
+                                    class="bg-primary text-white font-label-caps text-label-caps px-8 py-4 uppercase tracking-widest">BERIKUTNYA</span>
+                                <span
+                                    class="btn-chip bg-white border border-primary border-l-0 text-primary w-12 h-12 flex items-center justify-center transition-transform duration-300">
+                                    <span class="material-symbols-outlined"
+                                        style="font-variation-settings: 'FILL' 1;">chevron_right</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Step 2: Upload Dokumen -->
+                    <div class="hidden-step step-transition" id="step-2">
+                        <h2 class="font-headline-md text-headline-md mb-6 text-primary flex items-center gap-2">
+                            <span class="material-symbols-outlined">description</span>
+                            Upload Dokumen
+                        </h2>
+                        <p class="font-body-md text-body-md text-on-surface-variant mb-8">
+                            Silakan unggah Surat Persetujuan Kepala Sekolah (SK/Surat Izin) untuk memverifikasi
+                            pendaftaran sekolah Anda.
+                        </p>
+                        <div class="border-2 border-dashed border-outline-variant rounded-xl p-10 flex flex-col items-center justify-center bg-surface-container-lowest hover:border-primary transition-colors cursor-pointer group"
+                            onclick="document.getElementById('file-upload').click()">
+                            <input class="hidden" id="file-upload" onchange="handleFile(event)" type="file" />
+                            <div
+                                class="w-16 h-16 rounded-full bg-primary-fixed flex items-center justify-center text-primary mb-4 group-hover:scale-110 transition-transform">
+                                <span class="material-symbols-outlined text-4xl">upload_file</span>
+                            </div>
+                            <span class="font-headline-md text-headline-md text-primary mb-2">Pilih Berkas</span>
+                            <span class="text-on-surface-variant text-sm">Format PDF atau Image (Max 5MB)</span>
+                            <!-- File Name Placeholder -->
+                            <div class="hidden mt-6 bg-surface-container flex items-center gap-3 px-4 py-2 rounded-lg border border-outline-variant animate-pulse"
+                                id="file-preview">
+                                <span class="material-symbols-outlined text-teal-deep">check_circle</span>
+                                <span class="font-body-md text-primary truncate max-w-[200px]"
+                                    id="file-name-text">document.pdf</span>
+                            </div>
+                        </div>
+                        <div class="mt-10 flex justify-between items-center">
+                            <button
+                                class="text-primary font-label-caps text-label-caps hover:underline flex items-center gap-2"
+                                onclick="goToStep(1)" type="button">
+                                <span class="material-symbols-outlined">arrow_back</span>
+                                KEMBALI
+                            </button>
+                            <button class="jagapilar-btn flex items-center overflow-hidden transition-all group"
+                                type="submit">
+                                <span
+                                    class="bg-primary text-white font-label-caps text-label-caps px-8 py-4 uppercase tracking-widest">DAFTARKAN
+                                    SEKOLAH</span>
+                                <span
+                                    class="btn-chip bg-white border border-primary border-l-0 text-primary w-12 h-12 flex items-center justify-center transition-transform duration-300">
+                                    <span class="material-symbols-outlined"
+                                        style="font-variation-settings: 'FILL' 1;">send</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+    <!-- Footer -->
+    <footer class="bg-surface-container-highest border-t border-outline-variant w-full py-stack-lg">
+        <div
+            class="flex flex-col md:flex-row justify-between items-start px-margin-desktop max-w-container-max mx-auto gap-gutter">
+            <div class="max-w-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <img alt="JAGAPILAR Small Logo" class="h-8 w-auto grayscale opacity-70"
+                        src="https://lh3.googleusercontent.com/aida/AP1WRLsE1BBhiCgLhBmM_wbeMOXEfMM-Q6ey4SEuhimqolbiFhJfrxGHTnfN-PIg5DRp9rBtCCLtach9pRvVq6YarqIP1RG26f5J3QSlJRo6EKr7YJzFYnpapr6S15Rs2Wjv6KoyEhpCSNbWmO3tnEuhqj2uZg_1sUB6pgvC0n5hgXLSjwR6M93SahedXIcmNNj_2-1AJQdHaCMFeFr-ngQktKP51ipz_WL6cIgxaWjLXJlGf13Dpy3dlhFXaoKq" />
+                    <span class="font-headline-md text-headline-md font-bold text-primary opacity-80">JAGAPILAR</span>
+                </div>
+                <p class="font-body-md text-body-md text-on-surface-variant mb-4">
+                    Memberdayakan ekosistem pendidikan untuk perlindungan anak yang berkelanjutan melalui asesmen
+                    3-pilar yang berbasis data dan ilmiah.
+                </p>
+                <p class="font-body-md text-body-md text-on-surface-variant">© 2024 JAGAPILAR Child Protection Platform.
+                    All rights reserved.</p>
+            </div>
+            <div class="grid grid-cols-2 gap-x-12 gap-y-4">
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+                    href="#">Academic Credentials</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+                    href="#">Research Ethics</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+                    href="#">Privacy Policy</a>
+                <a class="font-body-md text-body-md text-on-surface-variant hover:text-primary transition-colors"
+                    href="#">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        function goToStep(step) {
+            const step1 = document.getElementById('step-1');
+            const step2 = document.getElementById('step-2');
+            const dot2 = document.getElementById('dot-2');
+            const lineFill = document.getElementById('line-fill');
+
+            if (step === 1) {
+                step2.classList.remove('active-step');
+                step2.classList.add('hidden-step');
+                setTimeout(() => {
+                    step1.classList.remove('hidden-step');
+                    step1.classList.add('active-step');
+                }, 300);
+
+                dot2.classList.replace('bg-primary', 'bg-surface-container-high');
+                dot2.classList.replace('text-white', 'text-on-surface-variant');
+                lineFill.style.width = '0%';
+            } else if (step === 2) {
+                step1.classList.remove('active-step');
+                step1.classList.add('hidden-step');
+                setTimeout(() => {
+                    step2.classList.remove('hidden-step');
+                    step2.classList.add('active-step');
+                }, 300);
+
+                dot2.classList.replace('bg-surface-container-high', 'bg-primary');
+                dot2.classList.replace('text-on-surface-variant', 'text-white');
+                lineFill.style.width = '100%';
+            }
+        }
+
+        function handleFile(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const preview = document.getElementById('file-preview');
+                const nameText = document.getElementById('file-name-text');
+                preview.classList.remove('hidden');
+                nameText.innerText = file.name;
+
+                // Add a small success bounce animation
+                preview.classList.add('scale-105');
+                setTimeout(() => preview.classList.remove('scale-105'), 200);
+            }
+        }
+
+        // Vanilla micro-interaction for input fields
+        document.querySelectorAll('input, select').forEach(element => {
+            element.addEventListener('focus', () => {
+                element.parentElement.querySelector('label').classList.add('text-primary');
+            });
+            element.addEventListener('blur', () => {
+                element.parentElement.querySelector('label').classList.remove('text-primary');
+            });
+        });
+    </script>
+</body>
+
+</html>
+
+<!-- JAGAPILAR Landing Page -->
+<!DOCTYPE html>
+<html lang="id" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Poppins:wght@700;800&amp;display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">try {
+            tailwind.config = {
+                darkMode: "class",
+                theme: {
+                    extend: {
+                        "colors": {
+                            "on-background": "#191c1e",
+                            "background": "#f9f9fd",
+                            "surface-variant": "#e2e2e6",
+                            "on-secondary-container": "#007169",
+                            "on-tertiary-fixed": "#3c0029",
+                            "tertiary-fixed-dim": "#ffaed8",
+                            "surface-dim": "#d9dadd",
+                            "primary-container": "#23587e",
+                            "on-secondary-fixed": "#00201d",
+                            "surface-bright": "#f9f9fd",
+                            "nav-blue": "#479BCE",
+                            "sky-blue": "#00A9E6",
+                            "zone-yellow": "#F5C363",
+                            "surface-container-highest": "#e2e2e6",
+                            "inverse-primary": "#9bccf7",
+                            "teal-deep": "#10868B",
+                            "on-primary-fixed": "#001d31",
+                            "tertiary-fixed": "#ffd8e9",
+                            "surface-tint": "#306289",
+                            "surface": "#f9f9fd",
+                            "on-primary": "#ffffff",
+                            "surface-container-lowest": "#ffffff",
+                            "secondary-fixed": "#59faec",
+                            "primary": "#004064",
+                            "on-primary-container": "#9dcef9",
+                            "on-tertiary-fixed-variant": "#890063",
+                            "on-tertiary-container": "#ffb2da",
+                            "tertiary": "#780056",
+                            "error-container": "#ffdad6",
+                            "primary-fixed": "#cce5ff",
+                            "on-tertiary": "#ffffff",
+                            "secondary-container": "#59faec",
+                            "outline": "#72787f",
+                            "surface-container": "#edeef1",
+                            "inverse-on-surface": "#f0f0f4",
+                            "secondary-fixed-dim": "#2eddcf",
+                            "surface-container-high": "#e7e8eb",
+                            "on-surface": "#191c1e",
+                            "on-secondary-fixed-variant": "#00504a",
+                            "inverse-surface": "#2e3133",
+                            "zone-green": "#178754",
+                            "on-error": "#ffffff",
+                            "secondary": "#006a63",
+                            "error": "#ba1a1a",
+                            "tertiary-container": "#a10075",
+                            "zone-red": "#D93A3F",
+                            "primary-fixed-dim": "#9bccf7",
+                            "on-error-container": "#93000a",
+                            "outline-variant": "#c1c7cf",
+                            "teal-light": "#32A8AD",
+                            "on-secondary": "#ffffff",
+                            "on-primary-fixed-variant": "#0f4b70",
+                            "pink-bright": "#FF50C9",
+                            "surface-container-low": "#f3f3f7",
+                            "on-surface-variant": "#41474e"
+                        },
+                        "borderRadius": {
+                            "DEFAULT": "0.25rem",
+                            "lg": "0.5rem",
+                            "xl": "0.75rem",
+                            "xxl": "1.5rem",
+                            "full": "9999px"
+                        },
+                        "spacing": {
+                            "gutter": "1rem",
+                            "stack-sm": "0.5rem",
+                            "container-max": "1280px",
+                            "stack-lg": "2rem",
+                            "margin-mobile": "1.5rem",
+                            "margin-desktop": "5rem",
+                            "stack-md": "1rem"
+                        },
+                        "fontFamily": {
+                            "headline-lg-mobile": ["Poppins"],
+                            "body-lg": ["Inter"],
+                            "headline-lg": ["Poppins"],
+                            "headline-md": ["Poppins"],
+                            "nav-link": ["Inter"],
+                            "body-md": ["Inter"],
+                            "label-caps": ["Poppins"]
+                        },
+                        "fontSize": {
+                            "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "800" }],
+                            "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                            "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                            "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                            "nav-link": ["16px", { "lineHeight": "1", "fontWeight": "500" }],
+                            "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                            "label-caps": ["14px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }]
+                        }
+                    },
+                },
+            }
+        } catch (_e) { }</script>
+    <meta charset="utf-8">
+</head>
+
+<body class="bg-background text-on-background font-body-md overflow-x-hidden">
+    <!-- TopNavBar -->
+    <nav
+        class="fixed top-0 w-full h-[90px] bg-surface dark:bg-surface-container-lowest z-50 transition-all duration-300 shadow-sm">
+        <div class="flex justify-between items-center h-full px-margin-desktop max-w-container-max mx-auto">
+            <!-- Brand Logo -->
+            <a href="#" class="flex items-center gap-3">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCldyVhV-xrdWAEMnqEK1FEKCt2MExe9gZTkC9ZcIZG_kYV44h_CFOO3EoKq4C5WO2e56HM4VDdvcw4Iw72VT11LIh54lOb-sj5RhuKb-GIDSGQW4w5wewtkAK9fZNJU2iKMF-tQ3pi176StBK1m4FZW_pAoAbOOHbPgCGzlA6PYTk9wNteKYR8V1eDstrx7x6CYeiDmo_x5PKwH8xQxDWTyTQpfDqejMfmcsbqdSOqk2ihJH1_7IC7-LJIJTbfuYA6fik-0j1RgYIG"
+                    class="h-12 w-auto" alt="JAGAPILAR Logo">
+                <span
+                    class="text-headline-md font-headline-md text-primary dark:text-primary-fixed tracking-tight">JAGAPILAR</span>
+            </a>
+            <!-- Nav Links -->
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#"
+                    class="text-nav-blue font-bold border-b-2 border-primary pb-1 font-nav-link text-nav-link hover:text-primary transition-colors duration-200">Beranda</a>
+                <a href="#cara-kerja"
+                    class="text-nav-blue font-nav-link text-nav-link hover:text-primary transition-colors duration-200">Cara
+                    Kerja</a>
+                <a href="#instrumen"
+                    class="text-nav-blue font-nav-link text-nav-link hover:text-primary transition-colors duration-200">Instrumen</a>
+                <a href="#"
+                    class="text-nav-blue font-nav-link text-nav-link hover:text-primary transition-colors duration-200">Untuk
+                    Sekolah</a>
+                <a href="#"
+                    class="text-nav-blue font-nav-link text-nav-link hover:text-primary transition-colors duration-200">Tentang
+                    Kami</a>
+                <a href="#"
+                    class="text-nav-blue font-nav-link text-nav-link hover:text-primary transition-colors duration-200">Kontak</a>
+            </div>
+            <!-- Primary Action -->
+
+        </div>
+    </nav>
+    <!-- Hero Section -->
+    <header class="relative pt-[90px] min-h-[85vh] flex items-center overflow-hidden">
+        <!-- Hero Background Image & Gradient -->
+        <div class="absolute inset-0 z-0">
+            <div class="absolute inset-0 hero-gradient z-10"></div>
+            <div class="absolute inset-0 bg-dot-pattern z-20"></div>
+            <div class="w-full h-full bg-cover bg-center"
+                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBOuyoNJqZ1Bwab-uvRT6J1ss60zNiAAl8uW-iB2fr3TC5Jdz0Yn-aolOyNTAqkJeftrbQS1lCNJ_RAyhYs7VnJeVqV_CF89Ftga6CGJ8HBM5fJObl-jRpqJZJD6UTp4VuTGj_zuGpUvf2ioFSGfprsgPaxPomJ0Y7hyUdOoII8KFSKWYG3AtD-eUuXksumVYceiESErJwxu5LxwiAcybzOCiItHRmkElhdrMdro9eXlGPER6HxXtnap2xiA3Zpr5yJl6T9xj4C3ywG')">
+            </div>
+        </div>
+        <div class="relative z-30 max-w-container-max mx-auto px-margin-desktop w-full py-20">
+            <div class="max-w-3xl">
+                <h1 class="font-headline-lg text-headline-lg text-on-primary uppercase leading-[1.1] mb-6">
+                    BERSAMA JAGA PIKIRAN,<br>KAWAL TUMBUH<br>KEMBANG ANAK
+                </h1>
+                <p class="font-body-lg text-body-lg text-on-primary/90 mb-10 max-w-2xl">
+                    JAGAPILAR adalah platform psikometrik 360° berbasis riset akademis yang didesain gratis untuk
+                    deteksi dini pengaruh konten digital negatif ("brain-rotting") pada anak melalui kolaborasi orang
+                    tua, guru, dan siswa.
+                </p>
+                <div class="flex flex-wrap gap-4">
+                    <button
+                        class="btn-signature flex items-center bg-primary border-2 border-primary text-on-primary font-label-caps text-label-caps py-4 px-8 group transition-all">
+                        MULAI / BUAT AKUN
+                        <span
+                            class="btn-chip ml-4 bg-white text-primary w-8 h-8 flex items-center justify-center transition-transform">
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </span>
+                    </button>
+                    <button
+                        class="flex items-center border-2 border-white/30 text-on-primary font-label-caps text-label-caps py-4 px-8 hover:bg-white/10 transition-colors">
+                        LIHAT INSTRUMEN
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <!-- Floating Role Selector -->
+    <section class="relative z-40 -mt-16 mb-24 max-w-container-max mx-auto px-margin-desktop">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Orang Tua -->
+            <div
+                class="bg-surface-container-lowest p-10 rounded-xxl shadow-xl shadow-primary/5 flex flex-col items-center text-center group hover:-translate-y-2 transition-transform duration-300">
+                <div
+                    class="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-on-primary mb-6 group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-4xl" data-weight="fill">family_restroom</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-primary mb-3">Orang Tua</h3>
+                <p class="font-body-md text-body-md text-on-surface-variant">Lakukan pemantauan perilaku anak di rumah
+                    melalui kuesioner harian yang terstruktur.</p>
+            </div>
+            <!-- Guru -->
+            <div
+                class="bg-surface-container-lowest p-10 rounded-xxl shadow-xl shadow-primary/5 flex flex-col items-center text-center group hover:-translate-y-2 transition-transform duration-300">
+                <div
+                    class="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-on-primary mb-6 group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-4xl" data-weight="fill">school</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-primary mb-3">Guru</h3>
+                <p class="font-body-md text-body-md text-on-surface-variant">Evaluasi fokus dan interaksi sosial siswa
+                    dalam lingkungan belajar di sekolah.</p>
+            </div>
+            <!-- Anak -->
+            <div
+                class="bg-surface-container-lowest p-10 rounded-xxl shadow-xl shadow-primary/5 flex flex-col items-center text-center group hover:-translate-y-2 transition-transform duration-300">
+                <div
+                    class="w-20 h-20 rounded-full bg-primary flex items-center justify-center text-on-primary mb-6 group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-4xl" data-weight="fill">child_care</span>
+                </div>
+                <h3 class="font-headline-md text-headline-md text-primary mb-3">Anak</h3>
+                <p class="font-body-md text-body-md text-on-surface-variant">Self-assessment interaktif yang membantu
+                    anak mengenali kebiasaan digital mereka.</p>
+            </div>
+        </div>
+    </section>
+    <!-- Kenapa Ini Penting -->
+    <section class="py-24 bg-surface-container-low">
+        <div class="max-w-container-max mx-auto px-margin-desktop">
+            <div class="text-center mb-16">
+                <h2 class="font-headline-lg text-headline-lg text-primary mb-4">KENAPA INI PENTING?</h2>
+                <div class="w-24 h-1 bg-teal-light mx-auto mb-6"></div>
+                <p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mx-auto">Tantangan digital pada
+                    anak usia dini di Indonesia memerlukan respons kolektif yang berbasis data.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Stat 1 -->
+                <div class="bg-surface-container-lowest p-8 border-l-4 border-teal-light shadow-sm">
+                    <div class="text-headline-lg font-headline-lg text-teal-deep mb-2">42,25%</div>
+                    <p class="font-body-md text-body-md text-on-surface">Anak usia dini Indonesia sudah memiliki akses
+                        mandiri ke perangkat HP.</p>
+                </div>
+                <!-- Stat 2 -->
+                <div class="bg-surface-container-lowest p-8 border-l-4 border-pink-bright shadow-sm">
+                    <div class="text-headline-lg font-headline-lg text-pink-bright mb-2">79%</div>
+                    <p class="font-body-md text-body-md text-on-surface">Anak terpapar durasi gadget yang melebihi batas
+                        rekomendasi kesehatan.</p>
+                </div>
+                <!-- Stat 3 -->
+                <div class="bg-surface-container-lowest p-8 border-l-4 border-nav-blue shadow-sm">
+                    <div class="text-headline-lg font-headline-lg text-nav-blue mb-2">185jt</div>
+                    <p class="font-body-md text-body-md text-on-surface">Populasi pengguna internet aktif di Indonesia
+                        yang rentan terhadap algoritma.</p>
+                </div>
+                <!-- Stat 4 -->
+                <div class="bg-surface-container-lowest p-8 border-l-4 border-primary shadow-sm">
+                    <div class="text-headline-lg font-headline-lg text-primary mb-2">0%</div>
+                    <p class="font-body-md text-body-md text-on-surface">Biaya yang diperlukan untuk melakukan asesmen
+                        rutin di platform JAGAPILAR.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Cara Kerja -->
+    <section id="cara-kerja" class="py-24 bg-white relative overflow-hidden">
+        <div
+            class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[500px] h-[500px] rounded-full bg-sky-blue/5">
+        </div>
+        <div class="max-w-container-max mx-auto px-margin-desktop">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+                <div class="max-w-2xl">
+                    <h2 class="font-headline-lg text-headline-lg text-primary mb-4">SISTEM KERJA 4 TAHAP</h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant">Metodologi kami dirancang untuk
+                        kesederhanaan tanpa mengurangi kedalaman hasil riset.</p>
+                </div>
+                <span
+                    class="material-symbols-outlined text-surface-variant text-[120px] select-none absolute right-20 opacity-20 pointer-events-none">analytics</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 relative">
+                <!-- Step 1 -->
+                <div class="relative p-8 bg-surface rounded-xl group hover:bg-primary transition-colors duration-300">
+                    <div class="text-label-caps font-label-caps text-nav-blue group-hover:text-sky-blue mb-4">01</div>
+                    <span
+                        class="material-symbols-outlined text-4xl text-primary group-hover:text-white mb-4">quiz</span>
+                    <h4 class="font-headline-md text-headline-md text-primary group-hover:text-white mb-2">Isi Kuesioner
+                    </h4>
+                    <p class="font-body-md text-body-md text-on-surface-variant group-hover:text-white/80">Cukup 6
+                        pertanyaan kunci yang dirancang oleh pakar psikologi anak.</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="relative p-8 bg-surface rounded-xl group hover:bg-primary transition-colors duration-300">
+                    <div class="text-label-caps font-label-caps text-nav-blue group-hover:text-sky-blue mb-4">02</div>
+                    <span
+                        class="material-symbols-outlined text-4xl text-primary group-hover:text-white mb-4">calculate</span>
+                    <h4 class="font-headline-md text-headline-md text-primary group-hover:text-white mb-2">Skor Otomatis
+                    </h4>
+                    <p class="font-body-md text-body-md text-on-surface-variant group-hover:text-white/80">Algoritma
+                        kami menghitung skor berdasarkan bobot setiap jawaban.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="relative p-8 bg-surface rounded-xl group hover:bg-primary transition-colors duration-300">
+                    <div class="text-label-caps font-label-caps text-nav-blue group-hover:text-sky-blue mb-4">03</div>
+                    <span
+                        class="material-symbols-outlined text-4xl text-primary group-hover:text-white mb-4">dashboard</span>
+                    <h4 class="font-headline-md text-headline-md text-primary group-hover:text-white mb-2">3 Zona Risiko
+                    </h4>
+                    <p class="font-body-md text-body-md text-on-surface-variant group-hover:text-white/80">Identifikasi
+                        langsung status anak dalam zona Hijau, Kuning, atau Merah.</p>
+                </div>
+                <!-- Step 4 -->
+                <div class="relative p-8 bg-surface rounded-xl group hover:bg-primary transition-colors duration-300">
+                    <div class="text-label-caps font-label-caps text-nav-blue group-hover:text-sky-blue mb-4">04</div>
+                    <span
+                        class="material-symbols-outlined text-4xl text-primary group-hover:text-white mb-4">clinical_notes</span>
+                    <h4 class="font-headline-md text-headline-md text-primary group-hover:text-white mb-2">Rujukan
+                        Opsional</h4>
+                    <p class="font-body-md text-body-md text-on-surface-variant group-hover:text-white/80">Dapatkan
+                        saran tindakan medis klinis jika skor menunjukkan risiko tinggi.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Instrumen 360 -->
+    <section id="instrumen" class="py-24 bg-surface overflow-hidden">
+        <div class="max-w-container-max mx-auto px-margin-desktop">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <h2 class="font-headline-lg text-headline-lg text-primary mb-6">INSTRUMEN VALIDASI 360°</h2>
+                    <p class="font-body-lg text-body-lg text-on-surface-variant mb-8">
+                        Kami menggunakan 18 pertanyaan validasi silang (6 per peran) untuk memastikan hasil asesmen yang
+                        objektif dan tidak bias.
+                    </p>
+                    <div class="space-y-6 mb-10">
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="px-6 py-2 rounded-full bg-zone-green text-on-primary font-label-caps text-label-caps shadow-lg shadow-zone-green/20">
+                                HIJAU: AMAN</div>
+                            <p class="text-sm italic text-on-surface-variant">Aktivitas kognitif normal &amp; interaksi
+                                sosial sehat.</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="px-6 py-2 rounded-full bg-zone-yellow text-primary font-label-caps text-label-caps shadow-lg shadow-zone-yellow/20">
+                                KUNING: WASPADA</div>
+                            <p class="text-sm italic text-on-surface-variant">Perlu pengawasan durasi dan konten digital
+                                harian.</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div
+                                class="px-6 py-2 rounded-full bg-zone-red text-on-primary font-label-caps text-label-caps shadow-lg shadow-zone-red/20">
+                                MERAH: PERLU TINDAKAN</div>
+                            <p class="text-sm italic text-on-surface-variant">Segera konsultasikan dengan psikolog atau
+                                dokter anak.</p>
+                        </div>
+                    </div>
+                    <button
+                        class="bg-primary text-on-primary font-label-caps text-label-caps py-4 px-8 flex items-center group">
+                        PELAJARI METODOLOGI
+                        <span class="ml-4 bg-white text-primary w-8 h-8 flex items-center justify-center">
+                            <span class="material-symbols-outlined">description</span>
+                        </span>
+                    </button>
+                </div>
+                <div class="relative">
+                    <div
+                        class="absolute -inset-4 border-2 border-dashed border-nav-blue/30 rounded-xxl -z-10 animate-pulse">
+                    </div>
+                    <div
+                        class="bg-surface-container-lowest p-10 rounded-xxl shadow-2xl border border-outline-variant/30">
+                        <div class="flex justify-between items-center mb-8">
+                            <span class="text-label-caps font-label-caps text-primary">STATUS REAL-TIME</span>
+                            <div class="flex gap-1">
+                                <div class="w-3 h-3 rounded-full bg-zone-red"></div>
+                                <div class="w-3 h-3 rounded-full bg-zone-yellow"></div>
+                                <div class="w-3 h-3 rounded-full bg-zone-green"></div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="h-4 bg-surface-container rounded-full overflow-hidden">
+                                <div class="h-full bg-zone-green w-[70%]"></div>
+                            </div>
+                            <div class="h-4 bg-surface-container rounded-full overflow-hidden">
+                                <div class="h-full bg-zone-yellow w-[20%]"></div>
+                            </div>
+                            <div class="h-4 bg-surface-container rounded-full overflow-hidden">
+                                <div class="h-full bg-zone-red w-[10%]"></div>
+                            </div>
+                            <div class="pt-6 border-t border-surface-variant">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-body-md text-on-surface-variant">Total Asesmen Selesai</span>
+                                    <span class="font-headline-md text-primary">12,482+</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Tentang Kami -->
+    <section class="py-24 bg-primary text-on-primary overflow-hidden relative">
+        <div class="absolute inset-0 bg-dot-pattern opacity-10"></div>
+        <div class="max-w-container-max mx-auto px-margin-desktop relative z-10">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="order-2 lg:order-1">
+                    <div
+                        class="aspect-video bg-white/10 rounded-xxl flex items-center justify-center relative overflow-hidden">
+                        <img class="w-full h-full object-cover opacity-80"
+                            data-alt="A professional, high-end photography of a research team working together in a bright, modern university setting with Indonesian cultural accents. The mood is collaborative, intellectual, and warm, with soft daylight streaming through large windows. The style is clean, corporate-academic, using a primary navy and teal color palette consistent with the JAGAPILAR brand."
+                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnZ4vHN1AIELRrlLYzi_tDH82czuQvnyePcjHtc0uprSwLpTwvpJGLO3uho-3GOmXHSGcIn-rT2qxKX0kc6BpV8b2S5qzHZGTyoRPoN12K2H0noc_2k6V5Dh9qd4_VVbtFjIurzPfrtCuz1ra_29yRZR939MaD4aPzf0duPs9zEOo-QFFwRpjBULCb-KK-YUaCEaMy0k7owMq8dJvT1qinGDOPGKiuL_m2b77fOCNbzkW4Twvs0uxhQbennaTmsKV_eHpJA8ywoY14">
+                        <div class="absolute inset-0 bg-gradient-to-t from-primary/80 to-transparent"></div>
+                        <div class="absolute bottom-8 left-8">
+                            <div class="text-headline-md font-headline-md">Tim Peneliti Akreditasi</div>
+                            <div class="text-label-caps font-label-caps text-sky-blue">FAKULTAS PSIKOLOGI</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <h2 class="font-headline-lg text-headline-lg text-on-primary mb-6">MISI KAMI</h2>
+                    <p class="font-body-lg text-body-lg mb-6 leading-relaxed">
+                        JAGAPILAR bermula dari riset akademis mendalam mengenai fenomena "brain-rotting" di era digital
+                        yang semakin agresif. Kami percaya bahwa setiap anak berhak mendapatkan lingkungan tumbuh
+                        kembang yang sehat tanpa hambatan kognitif.
+                    </p>
+                    <div class="grid grid-cols-2 gap-6 mb-10">
+                        <div>
+                            <span class="material-symbols-outlined text-sky-blue mb-2">volunteer_activism</span>
+                            <h4 class="font-headline-md text-headline-md mb-1">100% Gratis</h4>
+                            <p class="font-body-md text-on-primary/70 text-sm">Akses tanpa batas untuk semua sekolah
+                                &amp; orang tua.</p>
+                        </div>
+                        <div class="">
+                            <span class="material-symbols-outlined text-sky-blue mb-2">security</span>
+                            <h4 class="font-headline-md text-headline-md mb-1">Privasi Data</h4>
+                            <p class="font-body-md text-on-primary/70 text-sm">Data dienkripsi dan hanya digunakan untuk
+                                keperluan riset anonim.</p>
+                        </div>
+                    </div>
+                    <button
+                        class="bg-on-primary text-primary font-label-caps text-label-caps py-4 px-8 hover:bg-sky-blue hover:text-white transition-colors duration-300">
+                        BACA LAPORAN RISET
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Footer -->
+    <footer class="bg-primary dark:bg-on-primary-fixed w-full py-20 border-t border-white/10">
+        <div
+            class="grid grid-cols-1 md:grid-cols-3 gap-12 px-margin-desktop max-w-container-max mx-auto text-on-primary">
+            <!-- Brand Section -->
+            <div class="flex flex-col gap-6">
+                <div class="text-headline-md font-headline-md text-on-primary flex items-center gap-3">
+                    <img alt="JAGAPILAR Logo White" class="h-10 w-auto brightness-0 invert"
+                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuCldyVhV-xrdWAEMnqEK1FEKCt2MExe9gZTkC9ZcIZG_kYV44h_CFOO3EoKq4C5WO2e56HM4VDdvcw4Iw72VT11LIh54lOb-sj5RhuKb-GIDSGQW4w5wewtkAK9fZNJU2iKMF-tQ3pi176StBK1m4FZW_pAoAbOOHbPgCGzlA6PYTk9wNteKYR8V1eDstrx7x6CYeiDmo_x5PKwH8xQxDWTyTQpfDqejMfmcsbqdSOqk2ihJH1_7IC7-LJIJTbfuYA6fik-0j1RgYIG">
+                    JAGAPILAR
+                </div>
+                <p class="font-body-md text-body-md text-on-primary/80">
+                    Platform kolaboratif untuk menjaga kualitas kognitif dan kesehatan mental anak di era digital.
+                    Berbasis riset, terpercaya, dan gratis selamanya.
+                </p>
+            </div>
+            <!-- Links Section -->
+            <div class="grid grid-cols-2 gap-8">
+                <div>
+                    <h5 class="font-label-caps text-label-caps text-sky-blue mb-6">PLATFORM</h5>
+                    <ul class="flex flex-col gap-4">
+                        <li class=""><a
+                                class="text-on-primary/80 hover:text-secondary-fixed transition-colors font-body-md text-body-md"
+                                href="#">Instrumen</a></li>
+                        <li class=""><a
+                                class="text-on-primary/80 hover:text-secondary-fixed transition-colors font-body-md text-body-md"
+                                href="#">Untuk Guru</a></li>
+                        <li class=""><a
+                                class="text-on-primary/80 hover:text-secondary-fixed transition-colors font-body-md text-body-md"
+                                href="#">Pusat Bantuan</a></li>
+                    </ul>
+                </div>
+                <div class="">
+                    <h5 class="font-label-caps text-label-caps text-sky-blue mb-6">LEGAL</h5>
+                    <ul class="flex flex-col gap-4">
+                        <li class=""><a
+                                class="text-on-primary/80 hover:text-secondary-fixed transition-colors font-body-md text-body-md underline"
+                                href="#">Kebijakan Privasi</a></li>
+                        <li class=""><a
+                                class="text-on-primary/80 hover:text-secondary-fixed transition-colors font-body-md text-body-md"
+                                href="#">Syarat &amp; Ketentuan</a></li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Contact Section -->
+            <div>
+                <h5 class="font-label-caps text-label-caps text-sky-blue mb-6">HUBUNGI KAMI</h5>
+                <p class="font-body-md text-on-primary/80 mb-4">Punya pertanyaan atau ingin bermitra dengan sekolah
+                    Anda?</p>
+                <div class="flex gap-4">
+                    <a class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors"
+                        href="#">
+                        <span class="material-symbols-outlined text-sm">mail</span>
+                    </a>
+                    <a class="w-10 h-10 rounded-full border border-white/20 flex items-center justify-center hover:bg-white/10 transition-colors"
+                        href="#">
+                        <span class="material-symbols-outlined text-sm">share</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div
+            class="max-w-container-max mx-auto px-margin-desktop mt-20 pt-10 border-t border-white/10 text-center md:text-left">
+            <p class="font-body-md text-body-md text-on-primary/60">
+                © 2024 JAGAPILAR. Instrumen ini bersifat riset akademis dan bukan pengganti diagnosis medis klinis
+                profesional.
+            </p>
+        </div>
+    </footer>
+    <script>
+        // Simple scroll interaction for navbar
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 50) {
+                nav.classList.add('shadow-lg', 'h-[80px]');
+                nav.classList.remove('h-[90px]');
+            } else {
+                nav.classList.remove('shadow-lg', 'h-[80px]');
+                nav.classList.add('h-[90px]');
+            }
+        });
+
+        // Micro-interaction for buttons
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                btn.style.transform = 'scale(0.95)';
+            });
+            btn.addEventListener('mouseup', () => {
+                btn.style.transform = 'scale(1)';
+            });
+            btn.addEventListener('mouseleave', () => {
+                btn.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+# Secrets
+backend/.env
+
+# Build artifacts
+backend/*.exe
+
+# AI agent tooling (local, machine-specific)
+.claude/
+.agents/
+skills-lock.json
