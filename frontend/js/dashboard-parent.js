@@ -45,13 +45,34 @@ function generateRandomNeuroID() {
     return `NP-${p1}-${p2}`;
 }
 
-function generateNeuroID(e) {
+const API_BASE = '/api';
+
+async function generateNeuroID(e) {
     e.preventDefault();
     const name = document.getElementById('child-name').value;
     const year = document.getElementById('child-year').value;
     const gender = document.getElementById('child-gender').value;
 
-    const newId = generateRandomNeuroID();
+    const token = localStorage.getItem('jagapilar_token');
+    let newId = '';
+
+    try {
+        const res = await fetch(`${API_BASE}/children`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ name, birth_year: parseInt(year), gender })
+        });
+
+        if (!res.ok) throw new Error('API Error');
+        const data = await res.json();
+        newId = data.neuro_id;
+    } catch (error) {
+        console.warn('API gagal, menggunakan mode offline/mock.', error);
+        newId = generateRandomNeuroID();
+    }
     
     // Save to mock state
     children.push({

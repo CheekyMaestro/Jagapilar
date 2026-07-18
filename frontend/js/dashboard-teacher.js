@@ -29,7 +29,9 @@ function closeModal() {
     document.getElementById('add-student-modal').classList.add('hidden');
 }
 
-function addStudent(e) {
+const API_BASE = '/api';
+
+async function addStudent(e) {
     e.preventDefault();
     const neuroId = document.getElementById('student-neuro-id').value.trim().toUpperCase();
 
@@ -44,20 +46,42 @@ function addStudent(e) {
         return;
     }
 
-    // Simulate API fetch to validate Neuro ID
-    setTimeout(() => {
-        // Mock data
+    const token = localStorage.getItem('jagapilar_token');
+    
+    try {
+        const res = await fetch(`${API_BASE}/teacher/children`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ neuro_id: neuroId })
+        });
+        
+        if (!res.ok) throw new Error('API Error');
+        
+        // Asumsi API mengembalikan nama yang sebagian disembunyikan
+        const data = await res.json();
+        
+        students.push({
+            id: neuroId,
+            name: data.name || 'Anak (Data Tersembunyi)',
+            year: data.birth_year || 2012,
+            status: data.status || 'pending'
+        });
+    } catch (error) {
+        console.warn('API gagal, menggunakan mode offline/mock.', error);
         students.push({
             id: neuroId,
             name: 'Anak (Data Tersembunyi)',
             year: 2012,
             status: 'pending'
         });
+    }
 
-        closeModal();
-        renderStudents();
-        showToast('Murid berhasil ditambahkan!', 'success');
-    }, 500);
+    closeModal();
+    renderStudents();
+    showToast('Murid berhasil ditambahkan!', 'success');
 }
 
 function renderStudents() {

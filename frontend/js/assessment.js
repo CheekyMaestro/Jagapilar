@@ -227,7 +227,7 @@ function prevQuestion() {
 /**
  * Calculate score and show results
  */
-function submitAssessment() {
+async function submitAssessment() {
     const items = ASSESSMENT_ITEMS[currentRole];
 
     // Check all questions answered
@@ -241,6 +241,7 @@ function submitAssessment() {
     // Calculate pillar score with reverse-scoring
     let totalScore = 0;
     const itemScores = [];
+    const submissions = [];
 
     for (const item of items) {
         const rawScore = answers[item.code];
@@ -254,6 +255,7 @@ function submitAssessment() {
             isReverse: item.isReverse,
             construct: item.construct
         });
+        submissions.push({ item_code: item.code, raw_score: rawScore });
     }
 
     // Classify zone
@@ -291,6 +293,34 @@ function submitAssessment() {
             bgClass: 'bg-zone-red/10 border-zone-red/20',
             titleColor: 'text-zone-red'
         };
+    }
+
+    // Call API (fallback to local if failed)
+    const token = localStorage.getItem('jagapilar_token') || '';
+    try {
+        const res = await fetch('/api/assessment/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': token ? `Bearer ${token}` : '',
+                'X-User-Role': currentRole
+            },
+            body: JSON.stringify({
+                neuro_id: currentNeuroId,
+                pillar: currentRole,
+                total_score: totalScore,
+                zone: zone,
+                items: submissions
+            })
+        });
+
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || 'API Error');
+        }
+        console.log(`Berhasil dikirim ke server untuk Neuro ID: ${currentNeuroId}`);
+    } catch (error) {
+        console.warn('API gagal atau offline, hanya mensimulasikan hasil secara lokal.', error);
     }
 
     // Show results
@@ -331,8 +361,6 @@ function submitAssessment() {
 
     // Scroll to top
     window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    console.log(`Submitted for ${currentNeuroId}`, itemScores);
 }
 
 /**
