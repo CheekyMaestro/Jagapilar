@@ -64,6 +64,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             
             if (res && res.valid) {
+                // If it's a student, redirect to the specialized kids UI
+                if (res.role === 'student') {
+                    window.location.href = `assessment-kids.html?token=${token}`;
+                    return;
+                }
+                
                 // Auto-select role
                 selectRole(res.role);
                 

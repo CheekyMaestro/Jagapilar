@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JAGAPILAR Kids - Asesmen Anak</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#006a63",
+                        "tertiary": "#780056",
+                        "on-secondary-fixed": "#00201d",
+                        "tertiary-fixed": "#ffd8e9",
+                        "primary-container": "#23587e",
+                        "tertiary-fixed-dim": "#ffaed8",
+                        "surface-container-lowest": "#ffffff",
+                        "on-secondary-fixed-variant": "#00504a",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#9bccf7",
+                        "outline": "#72787f",
+                        "error": "#ba1a1a",
+                        "on-error": "#ffffff",
+                        "background": "#f9f9fd",
+                        "on-primary-container": "#9dcef9",
+                        "on-background": "#191c1e",
+                        "zone-green": "#178754",
+                        "secondary-container": "#59faec",
+                        "inverse-surface": "#2e3133",
+                        "secondary-fixed-dim": "#2eddcf",
+                        "surface-container": "#edeef1",
+                        "surface-container-highest": "#e2e2e6",
+                        "on-secondary-container": "#007169",
+                        "outline-variant": "#c1c7cf",
+                        "surface-tint": "#306289",
+                        "sky-blue": "#00A9E6",
+                        "teal-light": "#32A8AD",
+                        "on-primary-fixed-variant": "#0f4b70",
+                        "surface-container-low": "#f3f3f7",
+                        "surface": "#f9f9fd",
+                        "on-primary-fixed": "#001d31",
+                        "on-surface-variant": "#41474e",
+                        "teal-deep": "#10868B",
+                        "on-surface": "#191c1e",
+                        "pink-bright": "#FF50C9",
+                        "zone-red": "#D93A3F",
+                        "inverse-primary": "#9bccf7",
+                        "zone-yellow": "#F5C363",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-high": "#e7e8eb",
+                        "surface-variant": "#e2e2e6",
+                        "on-tertiary-container": "#ffb2da",
+                        "on-tertiary-fixed-variant": "#890063",
+                        "primary": "#004064",
+                        "inverse-on-surface": "#f0f0f4",
+                        "on-primary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#3c0029",
+                        "surface-dim": "#d9dadd",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#f9f9fd",
+                        "nav-blue": "#479BCE",
+                        "secondary-fixed": "#59faec",
+                        "tertiary-container": "#a10075",
+                        "primary-fixed": "#cce5ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "1rem",
+                        "stack-sm": "0.5rem",
+                        "stack-lg": "2rem",
+                        "margin-mobile": "1.5rem",
+                        "container-max": "1280px",
+                        "margin-desktop": "5rem",
+                        "stack-md": "1rem"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["Poppins"],
+                        "headline-md": ["Poppins"],
+                        "body-lg": ["Inter"],
+                        "nav-link": ["Inter"],
+                        "headline-lg-mobile": ["Poppins"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Poppins"]
+                    },
+                    "fontSize": {
+                        "label-caps": ["14px", { "lineHeight": "1", "letterSpacing": "0.1em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "700" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "nav-link": ["16px", { "lineHeight": "1", "fontWeight": "500" }],
+                        "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "fontWeight": "800" }],
+                        "body-md": ["16px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "800" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+
+        .bg-pattern {
+            background-color: #f9f9fd;
+            background-image: radial-gradient(#0040641a 1.5px, transparent 1.5px);
+            background-size: 32px 32px;
+        }
+
+        .blob-bg {
+            background: radial-gradient(circle at 50% 50%, #e0f2fe 0%, #f9f9fd 100%);
+        }
+
+        .emoji-btn:active {
+            transform: scale(0.92);
+        }
+
+        .emoji-btn.active {
+            background-color: #e2e2e6;
+            border-color: #004064;
+            box-shadow: 0 4px 12px rgba(0, 64, 100, 0.1);
+        }
+
+        .star-active {
+            color: #F5C363;
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .star-inactive {
+            color: #DBE1E5;
+            font-variation-settings: 'FILL' 0;
+        }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            opacity: 0;
+            top: 50%;
+            left: 50%;
+        }
+
+        @keyframes confetti-fall {
+            0% {
+                transform: translate(-50%, -50%) rotate(0deg) scale(0);
+                opacity: 1;
+            }
+
+            100% {
+                transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--r)) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .animate-confetti {
+            animation: confetti-fall 2.5s ease-out forwards;
+        }
+
+        .jagapilar-shadow {
+            box-shadow: 0 12px 40px -12px rgba(0, 64, 100, 0.15);
+        }
+        
+        /* Spinner for loading state */
+        .spinner {
+            border: 3px solid rgba(0, 64, 100, 0.1);
+            border-top-color: #004064;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body class="bg-pattern min-h-screen flex flex-col font-body-md text-on-surface overflow-x-hidden">
+
+    <!-- Top Navigation -->
+    <header class="bg-background fixed top-0 w-full z-40 h-[90px] flex items-center px-gutter max-w-container-max mx-auto left-0 right-0">
+        <div class="flex justify-between items-center w-full">
+            <h1 class="text-headline-md font-headline-md font-bold text-primary dark:text-sky-blue">JAGAPILAR Kids</h1>
+            <div class="flex gap-4">
+                <button class="material-symbols-outlined p-2 hover:bg-surface-container-high rounded-full transition-colors text-primary active:scale-95" data-icon="help">help</button>
+                <button class="material-symbols-outlined p-2 hover:bg-surface-container-high rounded-full transition-colors text-primary active:scale-95" data-icon="close">close</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Canvas -->
+    <main class="flex-grow pt-[110px] pb-32 px-4 md:px-margin-desktop flex items-center justify-center relative overflow-hidden" id="main-canvas">
+        <!-- Background Pattern / Blob -->
+        <div class="absolute inset-0 pointer-events-none opacity-20 hidden" id="bg-dots" style="background-image: radial-gradient(circle, #479BCE 1px, transparent 1px); background-size: 32px 32px;"></div>
+        <div id="confetti-container" class="absolute inset-0 pointer-events-none z-50"></div>
+
+        <!-- Decorative Soft Shapes -->
+        <div class="absolute -top-20 -right-20 w-80 h-80 bg-sky-blue/10 rounded-full blur-3xl pointer-events-none decorative-shape"></div>
+        <div class="absolute -bottom-20 -left-20 w-96 h-96 bg-pink-bright/5 rounded-full blur-3xl pointer-events-none decorative-shape"></div>
+
+        <!-- Loading State -->
+        <div id="loading-section" class="relative z-10 flex flex-col items-center justify-center">
+            <div class="spinner w-12 h-12 mb-4"></div>
+            <p class="text-primary font-headline-md">Menyiapkan Misi...</p>
+        </div>
+
+        <!-- Assessment Card Container (Question State) -->
+        <div id="question-section" class="relative w-full max-w-4xl z-10 hidden">
+            <!-- Question Buddy (Character Injection) -->
+            <div class="absolute -top-16 -right-4 md:-right-12 w-32 md:w-48 transform rotate-3 drop-shadow-xl animate-bounce" style="animation-duration: 3s;" id="jaga-buddy">
+                <img alt="JagaBuddy Character" class="w-full h-auto" src="https://lh3.googleusercontent.com/aida/AP1WRLsYOpa0ERvb4CjXbT94el6GjCQowSMbXwdjpvXjNYBe_4nBkt0qABfeDmtyXALYeSKfIIEATIinQagM4lNggK7ETsBZ3lbVCUGpNY6T1Eh0WZcnVWVkX5ZYMU6wU0kFolFpbgEKF1K6GLI-EIXqp5W0nconkqL4wGXDjrYjQloTZu8kJvPR7Pg76xGd3DwQ805Wl8pHVmaM-BJpVzEfbWAAKV7zh234loyh76ieTkwP0r5_E-N65xBE8O75" />
+            </div>
+            <div class="bg-surface-container-lowest rounded-[24px] shadow-lg md:shadow-xl p-6 md:p-12 border border-outline-variant/30 text-center relative">
+                
+                <!-- Progress Indicator -->
+                <div class="mb-10 inline-flex flex-col items-center">
+                    <span id="level-indicator" class="text-label-caps font-label-caps text-nav-blue mb-3">LEVEL 1 DARI 6</span>
+                    <div id="stars-container" class="flex gap-2">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Question Text -->
+                <h2 id="question-text" class="text-headline-md md:text-headline-md font-headline-md text-primary mb-12 max-w-2xl mx-auto leading-relaxed">
+                    <!-- Text injected by JS -->
+                </h2>
+
+                <!-- Emoji Response Grid -->
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
+                    <button class="emoji-btn group flex flex-col items-center p-4 border-2 border-transparent rounded-xl hover:bg-surface-container-low transition-all duration-200" onclick="selectEmoji(this, 1)">
+                        <span class="text-5xl md:text-6xl mb-3 transition-transform group-hover:scale-110">😟</span>
+                        <span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary" id="lbl-1">Nggak Pernah</span>
+                    </button>
+                    <button class="emoji-btn group flex flex-col items-center p-4 border-2 border-transparent rounded-xl hover:bg-surface-container-low transition-all duration-200" onclick="selectEmoji(this, 2)">
+                        <span class="text-5xl md:text-6xl mb-3 transition-transform group-hover:scale-110">😐</span>
+                        <span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary" id="lbl-2">Jarang</span>
+                    </button>
+                    <button class="emoji-btn group flex flex-col items-center p-4 border-2 border-transparent rounded-xl hover:bg-surface-container-low transition-all duration-200" onclick="selectEmoji(this, 3)">
+                        <span class="text-5xl md:text-6xl mb-3 transition-transform group-hover:scale-110">🙂</span>
+                        <span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary" id="lbl-3">Kadang-kadang</span>
+                    </button>
+                    <button class="emoji-btn group flex flex-col items-center p-4 border-2 border-transparent rounded-xl hover:bg-surface-container-low transition-all duration-200" onclick="selectEmoji(this, 4)">
+                        <span class="text-5xl md:text-6xl mb-3 transition-transform group-hover:scale-110">😊</span>
+                        <span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary" id="lbl-4">Sering</span>
+                    </button>
+                    <button class="emoji-btn group flex flex-col items-center p-4 border-2 border-transparent rounded-xl hover:bg-surface-container-low transition-all duration-200" onclick="selectEmoji(this, 5)">
+                        <span class="text-5xl md:text-6xl mb-3 transition-transform group-hover:scale-110">🤩</span>
+                        <span class="text-label-caps font-label-caps text-on-surface-variant group-hover:text-primary" id="lbl-5">Selalu</span>
+                    </button>
+                </div>
+
+                <!-- Action Button Container -->
+                <div class="mt-16 flex justify-center">
+                    <div class="flex items-center">
+                        <button id="next-btn" onclick="nextQuestion()" class="bg-primary text-on-primary font-label-caps text-label-caps py-4 px-8 hover:bg-primary-container transition-colors active:scale-95 shadow-lg h-14 min-w-[160px]">
+                            LANJUT
+                        </button>
+                        <div class="bg-surface-container-lowest border-y-2 border-r-2 border-primary w-14 h-14 flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined text-2xl font-bold">chevron_right</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Section (Celebration State) -->
+        <div id="success-section" class="max-w-2xl w-full text-center relative z-10 hidden">
+            <!-- Celebratory Monster Character -->
+            <div class="mb-stack-lg relative inline-block group">
+                <div class="absolute -inset-4 bg-sky-blue/10 rounded-full blur-2xl animate-pulse"></div>
+                <img alt="Monster maskot merayakan" class="w-64 h-64 md:w-80 md:h-80 mx-auto relative z-10 drop-shadow-2xl transition-transform duration-500 hover:scale-105" src="https://lh3.googleusercontent.com/aida/AP1WRLsYOpa0ERvb4CjXbT94el6GjCQowSMbXwdjpvXjNYBe_4nBkt0qABfeDmtyXALYeSKfIIEATIinQagM4lNggK7ETsBZ3lbVCUGpNY6T1Eh0WZcnVWVkX5ZYMU6wU0kFolFpbgEKF1K6GLI-EIXqp5W0nconkqL4wGXDjrYjQloTZu8kJvPR7Pg76xGd3DwQ805Wl8pHVmaM-BJpVzEfbWAAKV7zh234loyh76ieTkwP0r5_E-N65xBE8O75" />
+                
+                <!-- Floating Icons -->
+                <div class="absolute -top-4 -right-4 bg-zone-yellow text-on-surface rounded-full p-4 jagapilar-shadow animate-bounce" style="animation-delay: 75ms;">
+                    <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">stars</span>
+                </div>
+                <div class="absolute bottom-4 -left-8 bg-pink-bright text-white rounded-full p-3 jagapilar-shadow animate-bounce">
+                    <span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 1;">favorite</span>
+                </div>
+            </div>
+
+            <!-- Success Message -->
+            <div class="space-y-4 mb-stack-lg">
+                <h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary leading-tight">
+                    Terima kasih sudah jujur menjawab! 🎉
+                </h1>
+                <p class="text-body-lg font-body-lg text-on-surface-variant max-w-lg mx-auto">
+                    Hebat sekali! Kamu sudah menyelesaikan ke-6 pertanyaannya. Jawabanmu sangat membantu kami.
+                </p>
+            </div>
+
+            <!-- Composite Button Layout -->
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-6">
+                <a class="group flex items-stretch" href="index.html">
+                    <div class="bg-primary text-white px-8 py-4 flex items-center justify-center uppercase font-bold tracking-widest text-sm transition-colors group-hover:bg-primary-container">
+                        SELESAI
+                    </div>
+                    <div class="bg-white border-y border-r border-primary-fixed w-14 flex items-center justify-center transition-transform group-hover:translate-x-1">
+                        <span class="material-symbols-outlined text-primary">chevron_right</span>
+                    </div>
+                </a>
+                <button onclick="window.location.href='index.html'" class="text-nav-link font-nav-link text-primary hover:text-nav-blue underline underline-offset-8 transition-colors">
+                    Kembali ke Beranda
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation Shell (Status/Navigation) -->
+    <nav id="bottom-nav" class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20 bg-surface-container-lowest dark:bg-inverse-surface rounded-t-xl shadow-lg transition-transform duration-300 translate-y-0">
+        <button onclick="prevQuestion()" id="btn-back" class="flex flex-col items-center justify-center text-on-surface-variant p-3 hover:bg-surface-container-high transition-colors active:scale-90 duration-150">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span class="text-label-caps font-label-caps mt-1">Back</span>
+        </button>
+        <div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full p-3 shadow-sm">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">stars</span>
+            <span id="nav-progress-text" class="text-label-caps font-label-caps mt-1">1/6</span>
+        </div>
+        <button class="flex flex-col items-center justify-center text-on-surface-variant/50 p-3 cursor-not-allowed">
+            <span class="material-symbols-outlined">skip_next</span>
+            <span class="text-label-caps font-label-caps mt-1">Skip</span>
+        </button>
+    </nav>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-24 right-6 z-50 flex flex-col gap-3"></div>
+
+    <script src="js/main.js"></script>
+    <script src="js/assessment-kids.js"></script>
+</body>
+</html>
