@@ -143,16 +143,27 @@ function createCopyButton(baseUrl, token, role) {
     
     let colorClass = '';
     let label = '';
+    let targetUrl = `${baseUrl}?token=${token}`;
+    
     switch(role) {
-        case 'parent': colorClass = 'text-blue-600 bg-blue-50 hover:bg-blue-100'; label = 'Ortu'; break;
-        case 'teacher': colorClass = 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'; label = 'Guru'; break;
-        case 'student': colorClass = 'text-purple-600 bg-purple-50 hover:bg-purple-100'; label = 'Anak'; break;
+        case 'parent': 
+            colorClass = 'text-blue-600 bg-blue-50 hover:bg-blue-100'; 
+            label = 'Ortu'; 
+            break;
+        case 'teacher': 
+            colorClass = 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100'; 
+            label = 'Guru'; 
+            break;
+        case 'student': 
+            colorClass = 'text-purple-600 bg-purple-50 hover:bg-purple-100'; 
+            label = 'Anak'; 
+            // Ganti base url langsung ke UI anak
+            targetUrl = targetUrl.replace('assessment.html', 'assessment-kids.html');
+            break;
     }
     
-    const url = `${baseUrl}?token=${token}`;
-    
     return `
-        <button onclick="copyToClipboard('${url}')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 mx-auto ${colorClass}" title="Salin Link Asesmen">
+        <button onclick="copyToClipboard('${targetUrl}')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 mx-auto ${colorClass}" title="Salin Link Asesmen">
             <i class="ph ph-link"></i> Salin Link
         </button>
     `;

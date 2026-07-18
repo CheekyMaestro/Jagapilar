@@ -230,6 +230,10 @@ function submitAssessment() {
     document.getElementById('question-section').classList.add('hidden');
     document.getElementById('success-section').classList.remove('hidden');
     
+    // Add blob-bg for success screen to match design
+    document.getElementById('main-canvas').classList.add('blob-bg');
+    document.body.classList.remove('bg-pattern');
+    
     // Hide bottom nav
     document.getElementById('bottom-nav').classList.add('translate-y-full');
     
